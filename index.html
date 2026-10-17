@@ -1,0 +1,1268 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#20372d">
+	<title>Control Industrial | Máquinas</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+	<style>
+		:root {
+			--forest: #20372d;
+			--forest-deep: #172a22;
+			--green: #287355;
+			--green-dark: #205c43;
+			--green-pale: #e7f1eb;
+			--ink: #202922;
+			--muted: #758078;
+			--line: #e3e8e2;
+			--paper: #f4f6f2;
+			--white: #fff;
+			--amber: #d59138;
+			--red: #a43f36;
+			--shadow: 0 12px 32px rgb(29 49 39 / 6%);
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			margin: 0;
+			color: var(--ink);
+			background-color: var(--paper);
+			background-image: radial-gradient(#dce4db 0.7px, transparent 0.7px);
+			background-size: 16px 16px;
+			font-family: "DM Sans", sans-serif;
+		}
+
+		button, input { font: inherit; }
+
+		.app-shell { min-height: 100vh; }
+
+		.sidebar {
+			position: fixed;
+			inset: 0 auto 0 0;
+			z-index: 10;
+			display: flex;
+			width: 248px;
+			flex-direction: column;
+			padding: 28px 18px 20px;
+			color: #edf3ee;
+			background: var(--forest);
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 0 10px 32px;
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.brand-mark {
+			display: grid;
+			width: 38px;
+			height: 38px;
+			flex: 0 0 38px;
+			place-items: center;
+			border: 1px solid rgb(255 255 255 / 18%);
+			border-radius: 10px;
+			color: #f2bd69;
+			background: rgb(255 255 255 / 7%);
+			font-size: 19px;
+		}
+
+		.brand-name { display: block; font-size: 14px; font-weight: 700; letter-spacing: 0; }
+		.brand-caption { display: block; margin-top: 2px; color: #aab9ae; font-size: 11px; }
+
+		.nav-label {
+			margin: 0 10px 10px;
+			color: #aab9ae;
+			font-size: 10px;
+			font-weight: 700;
+			letter-spacing: 1.2px;
+			text-transform: uppercase;
+		}
+
+		.module-nav { display: grid; gap: 5px; }
+
+		.module-link {
+			display: flex;
+			min-height: 44px;
+			align-items: center;
+			gap: 11px;
+			padding: 0 11px;
+			border: 1px solid transparent;
+			border-radius: 7px;
+			color: #d5dfd7;
+			font-size: 13px;
+			text-decoration: none;
+		}
+
+		.module-link i { width: 18px; color: #b5c3b8; font-size: 16px; text-align: center; }
+		.module-link.active { border-color: rgb(255 255 255 / 9%); color: #fff; background: rgb(255 255 255 / 10%); }
+		.module-link.active i { color: #f2bd69; }
+		.module-link.disabled { cursor: default; opacity: .6; }
+		.module-view.d-none { display: none !important; }
+		.type-table { min-width: 480px; margin: 0; }
+		.type-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #778279; background: #fafbf9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
+		.type-table tbody td { padding: 13px 14px; border-bottom-color: #edf0ec; color: #364139; font-size: 11px; vertical-align: middle; }
+		.type-table tbody tr:last-child td { border-bottom: 0; }
+		.type-name { font-weight: 700; }
+		.type-description { color: #59665c; }
+
+		.module-soon {
+			margin-left: auto;
+			color: #c2cec4;
+			font-size: 9px;
+			white-space: nowrap;
+		}
+
+		.sidebar-foot {
+			display: flex;
+			align-items: center;
+			gap: 9px;
+			margin-top: auto;
+			padding: 16px 10px 0;
+			border-top: 1px solid rgb(255 255 255 / 12%);
+			color: #b5c3b8;
+			font-size: 11px;
+		}
+
+		.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #83c69b; }
+
+		.main-content { min-height: 100vh; margin-left: 248px; }
+
+		.topbar {
+			display: flex;
+			min-height: 64px;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 42px;
+			border-bottom: 1px solid var(--line);
+			background: rgb(255 255 255 / 88%);
+		}
+
+		.breadcrumb-line { color: var(--muted); font-size: 12px; }
+		.breadcrumb-line strong { color: var(--ink); font-weight: 600; }
+		.today { color: var(--muted); font-size: 12px; }
+
+		.workspace { width: min(1320px, 100%); margin: 0 auto; padding: 36px 42px 54px; }
+
+		.page-heading {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 20px;
+			margin-bottom: 27px;
+		}
+
+		.eyebrow {
+			margin-bottom: 7px;
+			color: var(--green);
+			font-size: 10px;
+			font-weight: 700;
+			letter-spacing: 1.25px;
+			text-transform: uppercase;
+		}
+
+		h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: 0; }
+		.page-subtitle { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+		.inventory-summary {
+			display: flex;
+			min-width: 170px;
+			align-items: center;
+			gap: 12px;
+			padding: 10px 14px;
+			border: 1px solid var(--line);
+			border-radius: 7px;
+			background: var(--white);
+		}
+
+		.summary-icon {
+			display: grid;
+			width: 34px;
+			height: 34px;
+			flex: 0 0 34px;
+			place-items: center;
+			border-radius: 7px;
+			color: var(--green);
+			background: var(--green-pale);
+			font-size: 16px;
+		}
+
+		.summary-number { display: block; font-size: 17px; font-weight: 700; line-height: 1.1; }
+		.summary-label { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+		.content-grid { display: grid; grid-template-columns: minmax(275px, .78fr) minmax(0, 1.5fr); align-items: start; gap: 19px; }
+
+		.surface {
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--white);
+			box-shadow: var(--shadow);
+		}
+
+		.surface-heading {
+			display: flex;
+			align-items: flex-start;
+			gap: 11px;
+			padding: 19px 20px 17px;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.surface-heading-icon {
+			display: grid;
+			width: 32px;
+			height: 32px;
+			flex: 0 0 32px;
+			place-items: center;
+			border-radius: 7px;
+			color: var(--green);
+			background: var(--green-pale);
+			font-size: 15px;
+		}
+
+		.surface-title { margin: 0; font-size: 14px; font-weight: 700; }
+		.surface-description { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+		.form-body { padding: 19px 20px 20px; }
+
+		.form-label { margin-bottom: 6px; color: #3c4940; font-size: 11px; font-weight: 700; }
+		.required-mark { color: var(--red); }
+
+		.form-control {
+			min-height: 40px;
+			border-color: #dce3dc;
+			border-radius: 5px;
+			color: var(--ink);
+			font-size: 12px;
+		}
+
+		.form-control::placeholder { color: #a4ada5; }
+		.form-control:focus { border-color: #71a58b; box-shadow: 0 0 0 3px rgb(40 115 85 / 12%); }
+		.code-input { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+		.field-help { margin-top: 5px; color: var(--muted); font-size: 10px; }
+		.field-block { margin-bottom: 15px; }
+
+		.btn-primary-action {
+			display: inline-flex;
+			min-height: 40px;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			border: 1px solid var(--green);
+			border-radius: 5px;
+			color: #fff;
+			background: var(--green);
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		.btn-primary-action:hover, .btn-primary-action:focus-visible { border-color: var(--green-dark); color: #fff; background: var(--green-dark); }
+		.btn-secondary-action { min-height: 38px; border-color: var(--line); color: #4f5b52; background: #fff; font-size: 11px; }
+		.btn-secondary-action:hover { border-color: #c4cec5; color: var(--ink); background: #f7f9f6; }
+		.form-actions { display: flex; gap: 8px; margin-top: 21px; }
+		.form-actions .btn-primary-action { flex: 1; }
+		.notice { margin: 0 20px 16px; font-size: 11px; }
+
+		.list-top {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 14px;
+			padding: 17px 19px;
+			border-bottom: 1px solid var(--line);
+		}
+
+		.list-top .surface-title { font-size: 13px; }
+		.list-tools { display: flex; align-items: center; gap: 8px; }
+		.export-button { min-height: 34px; padding: 0 11px; white-space: nowrap; }
+		.export-button:disabled { cursor: not-allowed; opacity: .55; }
+		.list-count { display: inline-flex; min-width: 22px; height: 22px; align-items: center; justify-content: center; margin-left: 6px; padding: 0 6px; border-radius: 20px; color: var(--green-dark); background: var(--green-pale); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+		.search-wrap { position: relative; width: min(230px, 52%); }
+		.search-wrap > i { position: absolute; top: 50%; left: 11px; color: #89948b; font-size: 13px; transform: translateY(-50%); }
+		.search-input { min-height: 34px; padding-left: 32px; font-size: 11px; }
+		.table-wrap { overflow-x: auto; }
+
+		.machine-table { min-width: 560px; margin: 0; }
+		.machine-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #778279; background: #fafbf9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
+		.machine-table tbody td { padding: 13px 14px; border-bottom-color: #edf0ec; color: #364139; font-size: 11px; vertical-align: middle; }
+		.machine-table tbody tr:last-child td { border-bottom: 0; }
+		.machine-code { color: var(--green-dark); font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; white-space: nowrap; }
+		.machine-brand { font-weight: 700; }
+		.machine-type { color: #59665c; }
+		.machine-capacity { color: #59665c; white-space: nowrap; }
+		.machine-table { min-width: 620px; }
+		.photo-thumb-button { display: grid; width: 42px; height: 42px; place-items: center; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 5px; color: #768278; background: #f7f9f6; font-size: 16px; }
+		.photo-thumb-button:not(:disabled):hover { border-color: #9cb6a3; color: var(--green-dark); }
+		.photo-thumb-button:disabled { cursor: default; opacity: .65; }
+		.photo-thumb-button img { width: 100%; height: 100%; object-fit: cover; }
+		.photo-preview { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+		.photo-preview img { width: 58px; height: 58px; border: 1px solid var(--line); border-radius: 5px; object-fit: cover; }
+		.photo-dialog { width: min(900px, calc(100vw - 32px)); max-width: none; max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #fff; box-shadow: 0 24px 80px rgb(0 0 0 / 25%); }
+		.photo-dialog::backdrop { background: rgb(15 27 20 / 76%); }
+		.photo-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+		.photo-dialog-title { margin: 0; font-size: 13px; font-weight: 700; }
+		.photo-dialog-image { display: block; width: 100%; max-height: calc(100vh - 100px); object-fit: contain; background: #f4f6f2; }
+		.photo-clear-button { min-height: 30px; padding: 3px 8px; font-size: 10px; }
+		.row-actions { display: flex; justify-content: flex-end; gap: 4px; }
+
+		.icon-button {
+			display: grid;
+			width: 30px;
+			height: 30px;
+			place-items: center;
+			border: 1px solid transparent;
+			border-radius: 5px;
+			color: #637066;
+			background: transparent;
+			font-size: 13px;
+		}
+
+		.icon-button:hover { border-color: var(--line); color: var(--green-dark); background: #f6f8f5; }
+		.icon-button.delete:hover { color: var(--red); background: #fbf1ef; }
+		.empty-cell { padding: 42px 20px !important; text-align: center; }
+		.empty-icon { display: block; margin-bottom: 9px; color: #aeb9af; font-size: 24px; }
+		.empty-title { display: block; color: #465249; font-size: 12px; font-weight: 700; }
+		.empty-copy { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+
+		@media (max-width: 1050px) {
+			.sidebar { width: 218px; }
+			.main-content { margin-left: 218px; }
+			.topbar { padding-right: 28px; padding-left: 28px; }
+			.workspace { padding-right: 28px; padding-left: 28px; }
+			.content-grid { grid-template-columns: minmax(255px, .82fr) minmax(0, 1.35fr); gap: 14px; }
+			.form-body { padding-right: 16px; padding-left: 16px; }
+		}
+
+		@media (max-width: 800px) {
+			.sidebar { position: static; width: 100%; padding: 13px 18px 12px; }
+			.brand { padding: 0 4px 12px; }
+			.brand-mark { width: 34px; height: 34px; flex-basis: 34px; }
+			.nav-label, .sidebar-foot { display: none; }
+			.module-nav { display: flex; gap: 5px; overflow-x: auto; padding-top: 7px; border-top: 1px solid rgb(255 255 255 / 12%); }
+			.module-link { min-height: 37px; flex: 0 0 auto; padding: 0 9px; font-size: 11px; }
+			.module-link i { font-size: 14px; }
+			.module-soon { display: none; }
+			.main-content { min-height: auto; margin-left: 0; }
+			.topbar { min-height: 48px; padding: 0 22px; }
+			.workspace { padding: 27px 22px 40px; }
+			.content-grid { grid-template-columns: minmax(0, 1fr); }
+			.form-body { padding: 18px 20px 20px; }
+		}
+
+		@media (max-width: 520px) {
+			.topbar { padding: 0 16px; }
+			.workspace { padding: 22px 14px 32px; }
+			.page-heading { align-items: flex-start; flex-direction: column; gap: 15px; margin-bottom: 19px; }
+			h1 { font-size: 25px; }
+			.inventory-summary { min-width: 0; }
+			.list-top { align-items: flex-start; flex-direction: column; }
+			.list-tools { width: 100%; }
+			.search-wrap { width: auto; flex: 1; }
+			.machine-table thead th, .machine-table tbody td { padding-right: 10px; padding-left: 10px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="app-shell">
+		<aside class="sidebar" aria-label="Navegación principal">
+			<a class="brand" href="#maquinas" aria-label="Control Industrial, inicio">
+				<span class="brand-mark"><i class="bi bi-gear-wide-connected" aria-hidden="true"></i></span>
+				<span>
+					<span class="brand-name">Control Industrial</span>
+					<span class="brand-caption">Gestión de planta</span>
+				</span>
+			</a>
+
+			<p class="nav-label">Módulos</p>
+			<nav class="module-nav" aria-label="Módulos del sistema">
+				<a class="module-link active" href="#maquinas" data-view="machines" aria-current="page">
+					<i class="bi bi-cpu" aria-hidden="true"></i><span>Máquinas</span>
+				</a>
+				<a class="module-link" href="#tipos-maquina" data-view="types">
+					<i class="bi bi-tags" aria-hidden="true"></i><span>Módulo de tipo de máquina</span>
+				</a>
+				<span class="module-link disabled" aria-disabled="true">
+					<i class="bi bi-box-seam" aria-hidden="true"></i><span>Repuestos</span><span class="module-soon">Próximamente</span>
+				</span>
+				<span class="module-link disabled" aria-disabled="true">
+					<i class="bi bi-wrench-adjustable" aria-hidden="true"></i><span>Mantenimientos</span><span class="module-soon">Próximamente</span>
+				</span>
+			</nav>
+
+			<div class="sidebar-foot"><span class="status-dot" aria-hidden="true"></span>Inventario local activo</div>
+		</aside>
+
+		<main class="main-content">
+			<header class="topbar">
+				<div class="breadcrumb-line">Inventario <span aria-hidden="true">/</span> <strong id="current-module">Máquinas</strong></div>
+				<time class="today" id="today"></time>
+			</header>
+
+			<div class="workspace module-view" id="machines-view">
+				<section class="page-heading" aria-labelledby="page-title">
+					<div>
+						<div class="eyebrow">Registro de activos</div>
+						<h1 id="page-title">Máquinas</h1>
+						<p class="page-subtitle">Consulta y administra los equipos industriales de tu planta.</p>
+					</div>
+					<div class="inventory-summary" aria-live="polite">
+						<span class="summary-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
+						<span><span class="summary-number" id="machine-total">0</span><span class="summary-label">equipos registrados</span></span>
+					</div>
+				</section>
+
+				<div class="content-grid">
+					<section class="surface" aria-labelledby="form-title">
+						<div class="surface-heading">
+							<span class="surface-heading-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
+							<div>
+								<h2 class="surface-title" id="form-title">Registrar máquina</h2>
+								<p class="surface-description">Completa los datos técnicos del equipo.</p>
+							</div>
+						</div>
+
+						<form id="machine-form" class="form-body">
+							<input id="machine-id" type="hidden">
+							<div class="field-block">
+								<label class="form-label" for="machine-code">Código de máquina <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control code-input" id="machine-code" name="code" type="text" maxlength="30" placeholder="Ej. MOT-001" autocomplete="off" required>
+								<div class="field-help">Debe ser único para cada máquina.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="machine-brand">Marca <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="machine-brand" name="brand" type="text" maxlength="60" placeholder="Ej. Siemens" autocomplete="organization" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="machine-type">Tipo de máquina <span class="required-mark" aria-hidden="true">*</span></label>
+								<select class="form-select form-control" id="machine-type" name="type" required>
+									<option value="">Selecciona un tipo de máquina</option>
+								</select>
+								<div class="field-help">Administra las opciones desde el módulo de tipos de máquina.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="machine-capacity">Capacidad <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="machine-capacity" name="capacity" type="text" maxlength="60" placeholder="Ej. 15 kW, 300 L/min" required>
+								<div class="field-help">Incluye la unidad de medida, si aplica.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="machine-photo">Fotografía de la máquina</label>
+								<input class="form-control" id="machine-photo" name="photo" type="file" accept="image/*" aria-describedby="photo-help">
+								<div class="field-help" id="photo-help">Opcional. La imagen se optimiza para almacenarse en este navegador.</div>
+								<div class="photo-preview d-none" id="photo-preview">
+									<img id="photo-preview-image" alt="Vista previa de la fotografía seleccionada">
+									<button class="btn btn-secondary-action photo-clear-button" id="clear-photo" type="button">Quitar fotografía</button>
+								</div>
+							</div>
+							<div class="form-actions">
+								<button class="btn btn-primary-action" id="submit-button" type="submit"><i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar máquina</span></button>
+								<button class="btn btn-secondary-action d-none" id="cancel-edit" type="button">Cancelar</button>
+							</div>
+						</form>
+						<div class="alert alert-success notice d-none" id="form-notice" role="status" aria-live="polite"></div>
+					</section>
+
+					<section class="surface" aria-labelledby="list-title">
+						<div class="list-top">
+							<div>
+								<h2 class="surface-title" id="list-title">Inventario de máquinas <span class="list-count" id="visible-count">0</span></h2>
+								<p class="surface-description">Todos los equipos registrados en este navegador.</p>
+							</div>
+							<div class="list-tools">
+								<button class="btn btn-primary-action export-button" id="export-machines" type="button" disabled>
+									<i class="bi bi-file-earmark-excel" aria-hidden="true"></i><span>Exportar a Excel</span>
+								</button>
+								<label class="search-wrap">
+									<i class="bi bi-search" aria-hidden="true"></i>
+									<span class="visually-hidden">Buscar máquinas</span>
+									<input class="form-control search-input" id="machine-search" type="search" placeholder="Buscar por código, marca o tipo">
+								</label>
+							</div>
+						</div>
+						<div class="table-wrap">
+							<table class="table machine-table align-middle">
+								<thead>
+									<tr>
+										<th scope="col">Foto</th>
+										<th scope="col">Código</th>
+										<th scope="col">Marca</th>
+										<th scope="col">Tipo de máquina</th>
+										<th scope="col">Capacidad</th>
+										<th scope="col"><span class="visually-hidden">Acciones</span></th>
+									</tr>
+								</thead>
+								<tbody id="machine-list"></tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</div>
+
+			<div class="workspace module-view d-none" id="types-view">
+				<section class="page-heading" aria-labelledby="types-page-title">
+					<div>
+						<div class="eyebrow">Catálogo de configuración</div>
+						<h1 id="types-page-title">Tipos de máquina</h1>
+						<p class="page-subtitle">Define los tipos disponibles y descríbelos para el inventario.</p>
+					</div>
+					<div class="inventory-summary" aria-live="polite">
+						<span class="summary-icon"><i class="bi bi-tags" aria-hidden="true"></i></span>
+						<span><span class="summary-number" id="type-total">0</span><span class="summary-label">tipos configurados</span></span>
+					</div>
+				</section>
+
+				<div class="content-grid">
+					<section class="surface" aria-labelledby="type-form-title">
+						<div class="surface-heading">
+							<span class="surface-heading-icon"><i class="bi bi-tag" aria-hidden="true"></i></span>
+							<div>
+								<h2 class="surface-title" id="type-form-title">Registrar tipo de máquina</h2>
+								<p class="surface-description">Los tipos guardados aparecerán en el formulario de máquinas.</p>
+							</div>
+						</div>
+						<form class="form-body" id="type-form">
+							<input id="type-id" type="hidden">
+							<div class="field-block">
+								<label class="form-label" for="type-name">Tipo de máquina <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="type-name" name="name" type="text" maxlength="80" placeholder="Ej. Motor de potencia" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="type-description">Descripción <span class="required-mark" aria-hidden="true">*</span></label>
+								<textarea class="form-control" id="type-description" name="description" rows="3" maxlength="240" placeholder="Describe el uso o las características del tipo" required></textarea>
+							</div>
+							<div class="form-actions">
+								<button class="btn btn-primary-action" id="type-submit-button" type="submit"><i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar tipo</span></button>
+								<button class="btn btn-secondary-action d-none" id="type-cancel-edit" type="button">Cancelar</button>
+							</div>
+						</form>
+						<div class="alert alert-success notice d-none" id="type-notice" role="status" aria-live="polite"></div>
+					</section>
+
+					<section class="surface" aria-labelledby="type-list-title">
+						<div class="list-top">
+							<div>
+								<h2 class="surface-title" id="type-list-title">Tipos registrados <span class="list-count" id="visible-type-count">0</span></h2>
+								<p class="surface-description">Gestiona las opciones disponibles para las máquinas.</p>
+							</div>
+							<label class="search-wrap">
+								<i class="bi bi-search" aria-hidden="true"></i>
+								<span class="visually-hidden">Buscar tipos de máquina</span>
+								<input class="form-control search-input" id="type-search" type="search" placeholder="Buscar tipo o descripción">
+							</label>
+						</div>
+						<div class="table-wrap">
+							<table class="table type-table align-middle">
+								<thead>
+									<tr><th scope="col">Tipo de máquina</th><th scope="col">Descripción</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr>
+								</thead>
+								<tbody id="type-list"></tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</div>
+		</main>
+	</div>
+	<dialog class="photo-dialog" id="photo-dialog" aria-labelledby="photo-dialog-title">
+		<div class="photo-dialog-header">
+			<h2 class="photo-dialog-title" id="photo-dialog-title">Fotografía de máquina</h2>
+			<button class="icon-button" id="close-photo-dialog" type="button" aria-label="Cerrar fotografía" title="Cerrar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+		</div>
+		<img class="photo-dialog-image" id="enlarged-photo" alt="Fotografía ampliada de la máquina">
+	</dialog>
+
+	<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+	<script>
+		const STORAGE_KEY = "control-industrial-maquinas-v1";
+		const TYPE_STORAGE_KEY = "control-industrial-tipos-maquina-v1";
+		const machineForm = document.querySelector("#machine-form");
+		const machineList = document.querySelector("#machine-list");
+		const machineIdInput = document.querySelector("#machine-id");
+		const machineCodeInput = document.querySelector("#machine-code");
+		const machineBrandInput = document.querySelector("#machine-brand");
+		const machineTypeInput = document.querySelector("#machine-type");
+		const machineCapacityInput = document.querySelector("#machine-capacity");
+		const machinePhotoInput = document.querySelector("#machine-photo");
+		const photoPreview = document.querySelector("#photo-preview");
+		const photoPreviewImage = document.querySelector("#photo-preview-image");
+		const clearPhotoButton = document.querySelector("#clear-photo");
+		const photoDialog = document.querySelector("#photo-dialog");
+		const photoDialogTitle = document.querySelector("#photo-dialog-title");
+		const enlargedPhoto = document.querySelector("#enlarged-photo");
+		const machineSearch = document.querySelector("#machine-search");
+		const exportMachinesButton = document.querySelector("#export-machines");
+		const machineTotal = document.querySelector("#machine-total");
+		const visibleCount = document.querySelector("#visible-count");
+		const formTitle = document.querySelector("#form-title");
+		const submitButton = document.querySelector("#submit-button");
+		const cancelEditButton = document.querySelector("#cancel-edit");
+		const formNotice = document.querySelector("#form-notice");
+		const typeForm = document.querySelector("#type-form");
+		const typeList = document.querySelector("#type-list");
+		const typeIdInput = document.querySelector("#type-id");
+		const typeNameInput = document.querySelector("#type-name");
+		const typeDescriptionInput = document.querySelector("#type-description");
+		const typeSearch = document.querySelector("#type-search");
+		const typeTotal = document.querySelector("#type-total");
+		const visibleTypeCount = document.querySelector("#visible-type-count");
+		const typeFormTitle = document.querySelector("#type-form-title");
+		const typeSubmitButton = document.querySelector("#type-submit-button");
+		const typeCancelEditButton = document.querySelector("#type-cancel-edit");
+		const typeNotice = document.querySelector("#type-notice");
+		const machinesView = document.querySelector("#machines-view");
+		const typesView = document.querySelector("#types-view");
+		const currentModule = document.querySelector("#current-module");
+		const moduleLinks = document.querySelectorAll(".module-link[data-view]");
+
+		let machines = loadMachines();
+		let machineTypes = loadMachineTypes();
+		let currentPhotoData = "";
+		let photoProcessing = false;
+
+		function loadMachines() {
+			try {
+				const savedMachines = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+				return Array.isArray(savedMachines) ? savedMachines : [];
+			} catch {
+				return [];
+			}
+		}
+
+		function loadMachineTypes() {
+			const initialTypes = [
+				{ id: "default-motor", name: "Motor de potencia", description: "Máquina eléctrica que convierte energía eléctrica en energía mecánica." },
+				{ id: "default-cilindro", name: "Cilindro neumático", description: "Actuador que convierte aire comprimido en movimiento lineal." }
+			];
+
+			try {
+				const savedTypes = localStorage.getItem(TYPE_STORAGE_KEY);
+				const parsedTypes = savedTypes === null ? initialTypes : JSON.parse(savedTypes);
+				const types = Array.isArray(parsedTypes) ? parsedTypes : [];
+				const knownNames = new Set(types.map((machineType) => machineType.name.toLocaleLowerCase("es")));
+				let addedLegacyType = false;
+
+				for (const machine of machines) {
+					const name = typeof machine.type === "string" ? machine.type.trim() : "";
+					const normalizedName = name.toLocaleLowerCase("es");
+					if (!name || knownNames.has(normalizedName)) continue;
+					types.push({
+						id: `migrated-${Date.now()}-${types.length}`,
+						name,
+						description: "Tipo recuperado de un registro de máquina existente."
+					});
+					knownNames.add(normalizedName);
+					addedLegacyType = true;
+				}
+
+				if (savedTypes === null || addedLegacyType) {
+					localStorage.setItem(TYPE_STORAGE_KEY, JSON.stringify(types));
+				}
+				return types;
+			} catch {
+				return initialTypes;
+			}
+		}
+
+		function saveMachineTypes() {
+			try {
+				localStorage.setItem(TYPE_STORAGE_KEY, JSON.stringify(machineTypes));
+				return true;
+			} catch {
+				showTypeNotice("No fue posible guardar los tipos en este navegador.", "danger");
+				return false;
+			}
+		}
+
+		function showTypeNotice(message, type = "success") {
+			typeNotice.textContent = message;
+			typeNotice.className = `alert alert-${type} notice`;
+		}
+
+		function hideTypeNotice() {
+			typeNotice.classList.add("d-none");
+		}
+
+		function renderMachineTypeOptions() {
+			const selectedType = machineTypeInput.value;
+			machineTypeInput.replaceChildren(new Option("Selecciona un tipo de máquina", ""));
+			for (const machineType of machineTypes) {
+				machineTypeInput.add(new Option(machineType.name, machineType.name));
+			}
+			machineTypeInput.value = machineTypes.some((machineType) => machineType.name === selectedType) ? selectedType : "";
+		}
+
+		function renderMachineTypes() {
+			const query = typeSearch.value.trim().toLocaleLowerCase("es");
+			const filteredTypes = machineTypes.filter((machineType) =>
+				[machineType.name, machineType.description].some((value) => value.toLocaleLowerCase("es").includes(query))
+			);
+
+			typeList.replaceChildren();
+			typeTotal.textContent = String(machineTypes.length);
+			visibleTypeCount.textContent = String(filteredTypes.length);
+			renderMachineTypeOptions();
+
+			if (filteredTypes.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.colSpan = 3;
+				cell.className = "empty-cell";
+				const title = document.createElement("span");
+				title.className = "empty-title";
+				title.textContent = machineTypes.length === 0 ? "Aún no hay tipos registrados" : "No se encontraron coincidencias";
+				const description = document.createElement("span");
+				description.className = "empty-copy";
+				description.textContent = machineTypes.length === 0
+					? "Registra un tipo para que aparezca en el formulario de máquinas."
+					: "Prueba con otro tipo o descripción.";
+				cell.append(title, description);
+				row.append(cell);
+				typeList.append(row);
+				return;
+			}
+
+			for (const machineType of filteredTypes) {
+				const row = document.createElement("tr");
+				const nameCell = document.createElement("td");
+				const name = document.createElement("span");
+				name.className = "type-name";
+				name.textContent = machineType.name;
+				nameCell.append(name);
+				const descriptionCell = document.createElement("td");
+				const description = document.createElement("span");
+				description.className = "type-description";
+				description.textContent = machineType.description;
+				descriptionCell.append(description);
+				const actionCell = document.createElement("td");
+				const actions = document.createElement("div");
+				actions.className = "row-actions";
+				actions.append(
+					createActionButton("bi-pencil-square", "Editar", "edit-type", machineType.id),
+					createActionButton("bi-trash3", "Eliminar", "delete-type", machineType.id)
+				);
+				actionCell.append(actions);
+				row.append(nameCell, descriptionCell, actionCell);
+				typeList.append(row);
+			}
+		}
+
+		function resetTypeForm() {
+			typeForm.reset();
+			typeIdInput.value = "";
+			typeNameInput.setCustomValidity("");
+			typeFormTitle.textContent = "Registrar tipo de máquina";
+			typeSubmitButton.innerHTML = '<i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar tipo</span>';
+			typeCancelEditButton.classList.add("d-none");
+		}
+
+		function showModule(view) {
+			const showTypes = view === "types";
+			machinesView.classList.toggle("d-none", showTypes);
+			typesView.classList.toggle("d-none", !showTypes);
+			currentModule.textContent = showTypes ? "Módulo de tipo de máquina" : "Máquinas";
+			document.title = showTypes ? "Control Industrial | Tipos de máquina" : "Control Industrial | Máquinas";
+			for (const link of moduleLinks) {
+				const isActive = link.dataset.view === view;
+				link.classList.toggle("active", isActive);
+				if (isActive) link.setAttribute("aria-current", "page");
+				else link.removeAttribute("aria-current");
+			}
+		}
+
+		function saveMachines() {
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(machines));
+				return true;
+			} catch {
+				showNotice("No fue posible guardar los datos en este navegador.", "danger");
+				return false;
+			}
+		}
+
+		function showNotice(message, type = "success") {
+			formNotice.textContent = message;
+			formNotice.className = `alert alert-${type} notice`;
+		}
+
+		function hideNotice() {
+			formNotice.classList.add("d-none");
+		}
+
+		function compressPhoto(file) {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onerror = () => reject(new Error("No se pudo leer la fotografía."));
+				reader.onload = () => {
+					const image = new Image();
+					image.onerror = () => reject(new Error("El archivo seleccionado no es una imagen válida."));
+					image.onload = () => {
+						const scale = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
+						const canvas = document.createElement("canvas");
+						canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+						canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+						const context = canvas.getContext("2d");
+						if (!context) {
+							reject(new Error("No fue posible optimizar la fotografía."));
+							return;
+						}
+						context.fillStyle = "#fff";
+						context.fillRect(0, 0, canvas.width, canvas.height);
+						context.drawImage(image, 0, 0, canvas.width, canvas.height);
+						resolve(canvas.toDataURL("image/jpeg", 0.78));
+					};
+					image.src = reader.result;
+				};
+				reader.readAsDataURL(file);
+			});
+		}
+
+		function showPhotoPreview(photoData) {
+			photoPreviewImage.src = photoData;
+			photoPreview.classList.toggle("d-none", !photoData);
+		}
+
+		function createActionButton(iconName, label, action, machineId) {
+			const button = document.createElement("button");
+			button.type = "button";
+			button.className = `icon-button${action === "delete" ? " delete" : ""}`;
+			button.setAttribute("aria-label", `${label}: ${machineId}`);
+			button.title = label;
+			button.dataset.action = action;
+			button.dataset.id = machineId;
+
+			const icon = document.createElement("i");
+			icon.className = `bi ${iconName}`;
+			icon.setAttribute("aria-hidden", "true");
+			button.append(icon);
+			return button;
+		}
+
+		function createPhotoButton(machine) {
+			const button = document.createElement("button");
+			button.type = "button";
+			button.className = "photo-thumb-button";
+			button.dataset.action = "view-photo";
+			button.dataset.id = machine.id;
+			button.disabled = !machine.photoData;
+			button.setAttribute("aria-label", machine.photoData ? `Ampliar fotografía de ${machine.code}` : `Sin fotografía para ${machine.code}`);
+			button.title = machine.photoData ? "Ampliar fotografía" : "Sin fotografía";
+
+			if (machine.photoData) {
+				const image = document.createElement("img");
+				image.src = machine.photoData;
+				image.alt = "";
+				button.append(image);
+			} else {
+				const icon = document.createElement("i");
+				icon.className = "bi bi-image";
+				icon.setAttribute("aria-hidden", "true");
+				button.append(icon);
+			}
+			return button;
+		}
+
+		function renderMachines() {
+			const query = machineSearch.value.trim().toLocaleLowerCase("es");
+			const filteredMachines = machines.filter((machine) =>
+				[machine.code, machine.brand, machine.type, machine.capacity]
+					.some((value) => value.toLocaleLowerCase("es").includes(query))
+			);
+
+			machineList.replaceChildren();
+			machineTotal.textContent = String(machines.length);
+			visibleCount.textContent = String(filteredMachines.length);
+			exportMachinesButton.disabled = machines.length === 0;
+
+			if (filteredMachines.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.colSpan = 6;
+				cell.className = "empty-cell";
+
+				const icon = document.createElement("i");
+				icon.className = `bi ${machines.length === 0 ? "bi-inboxes" : "bi-search"} empty-icon`;
+				icon.setAttribute("aria-hidden", "true");
+
+				const title = document.createElement("span");
+				title.className = "empty-title";
+				title.textContent = machines.length === 0 ? "Aún no hay máquinas registradas" : "No se encontraron coincidencias";
+
+				const description = document.createElement("span");
+				description.className = "empty-copy";
+				description.textContent = machines.length === 0
+					? "Completa el formulario para agregar el primer equipo."
+					: "Prueba con otro código, marca o tipo de máquina.";
+
+				cell.append(icon, title, description);
+				row.append(cell);
+				machineList.append(row);
+				return;
+			}
+
+			for (const machine of filteredMachines) {
+				const row = document.createElement("tr");
+				const photoCell = document.createElement("td");
+				photoCell.append(createPhotoButton(machine));
+				row.append(photoCell);
+				const values = [
+					{ value: machine.code, className: "machine-code" },
+					{ value: machine.brand, className: "machine-brand" },
+					{ value: machine.type, className: "machine-type" },
+					{ value: machine.capacity, className: "machine-capacity" }
+				];
+
+				for (const item of values) {
+					const cell = document.createElement("td");
+					const text = document.createElement("span");
+					text.className = item.className;
+					text.textContent = item.value;
+					cell.append(text);
+					row.append(cell);
+				}
+
+				const actionCell = document.createElement("td");
+				const actions = document.createElement("div");
+				actions.className = "row-actions";
+				actions.append(
+					createActionButton("bi-pencil-square", "Editar", "edit", machine.id),
+					createActionButton("bi-trash3", "Eliminar", "delete", machine.id)
+				);
+				actionCell.append(actions);
+				row.append(actionCell);
+				machineList.append(row);
+			}
+		}
+
+		async function exportMachinesToExcel() {
+			if (machines.length === 0) return;
+			if (!globalThis.ExcelJS) {
+				showNotice("No se pudo cargar la librería de Excel. Revisa tu conexión a internet e inténtalo de nuevo.", "danger");
+				return;
+			}
+
+			exportMachinesButton.disabled = true;
+			exportMachinesButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Preparando Excel...</span>';
+			try {
+				const workbook = new ExcelJS.Workbook();
+				workbook.creator = "Control Industrial";
+				workbook.created = new Date();
+				const worksheet = workbook.addWorksheet("Máquinas", { views: [{ state: "frozen", ySplit: 1 }] });
+				worksheet.columns = [
+					{ header: "Fotografía", key: "photo", width: 18 },
+					{ header: "Código", key: "code", width: 18 },
+					{ header: "Marca", key: "brand", width: 22 },
+					{ header: "Tipo de máquina", key: "type", width: 28 },
+					{ header: "Capacidad", key: "capacity", width: 22 }
+				];
+
+				const header = worksheet.getRow(1);
+				header.height = 26;
+				header.eachCell((cell) => {
+					cell.font = { bold: true, color: { argb: "FFFFFFFF" }, name: "Arial", size: 11 };
+					cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF20372D" } };
+					cell.alignment = { vertical: "middle", horizontal: "left" };
+				});
+
+				machines.forEach((machine, index) => {
+					const rowNumber = index + 2;
+					const row = worksheet.addRow({
+						photo: machine.photoData ? "" : "Sin fotografía",
+						code: machine.code,
+						brand: machine.brand,
+						type: machine.type,
+						capacity: machine.capacity
+					});
+					row.height = machine.photoData ? 58 : 24;
+					row.alignment = { vertical: "middle", wrapText: true };
+					row.eachCell((cell) => {
+						cell.border = { bottom: { style: "thin", color: { argb: "FFE3E8E2" } } };
+					});
+
+					if (machine.photoData) {
+						const imageId = workbook.addImage({ base64: machine.photoData, extension: "jpeg" });
+						worksheet.addImage(imageId, {
+							tl: { col: 0, row: rowNumber - 1 },
+							ext: { width: 90, height: 72 },
+							editAs: "oneCell"
+						});
+					}
+				});
+
+				worksheet.autoFilter = { from: "A1", to: "E1" };
+				const fileBuffer = await workbook.xlsx.writeBuffer();
+				const fileBlob = new Blob([fileBuffer], {
+					type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+				});
+				const downloadUrl = URL.createObjectURL(fileBlob);
+				const downloadLink = document.createElement("a");
+				downloadLink.href = downloadUrl;
+				downloadLink.download = `inventario-maquinas-${new Date().toISOString().slice(0, 10)}.xlsx`;
+				downloadLink.click();
+				window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+				showNotice(`Se exportaron ${machines.length} máquinas a Excel con sus fotografías.`, "success");
+			} catch (error) {
+				showNotice(`No fue posible generar el archivo Excel: ${error.message}`, "danger");
+			} finally {
+				exportMachinesButton.innerHTML = '<i class="bi bi-file-earmark-excel" aria-hidden="true"></i><span>Exportar a Excel</span>';
+				exportMachinesButton.disabled = machines.length === 0;
+			}
+		}
+
+		function resetForm() {
+			machineForm.reset();
+			machineIdInput.value = "";
+			currentPhotoData = "";
+			showPhotoPreview("");
+			machineCodeInput.setCustomValidity("");
+			formTitle.textContent = "Registrar máquina";
+			submitButton.innerHTML = '<i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar máquina</span>';
+			cancelEditButton.classList.add("d-none");
+		}
+
+		machineForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			hideNotice();
+			machineCodeInput.setCustomValidity("");
+			if (photoProcessing) {
+				showNotice("Espera a que termine la optimización de la fotografía.", "warning");
+				return;
+			}
+
+			if (!machineForm.reportValidity()) return;
+
+			const editingId = machineIdInput.value;
+			const code = machineCodeInput.value.trim().toLocaleUpperCase("es");
+			const duplicate = machines.some((machine) =>
+				machine.code.toLocaleLowerCase("es") === code.toLocaleLowerCase("es") && machine.id !== editingId
+			);
+
+			if (duplicate) {
+				machineCodeInput.setCustomValidity("Ya existe una máquina con este código.");
+				machineCodeInput.reportValidity();
+				return;
+			}
+
+			const machine = {
+				id: editingId || globalThis.crypto?.randomUUID?.() || String(Date.now()),
+				code,
+				brand: machineBrandInput.value.trim(),
+				type: machineTypeInput.value.trim(),
+				capacity: machineCapacityInput.value.trim(),
+				photoData: currentPhotoData
+			};
+
+			if (editingId) {
+				machines = machines.map((item) => item.id === editingId ? machine : item);
+			} else {
+				machines.unshift(machine);
+			}
+
+			if (!saveMachines()) return;
+
+			resetForm();
+			renderMachines();
+			showNotice(editingId ? "Los cambios se guardaron correctamente." : "La máquina se registró correctamente.");
+		});
+
+		typeForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			hideTypeNotice();
+			typeNameInput.setCustomValidity("");
+			if (!typeForm.reportValidity()) return;
+
+			const editingId = typeIdInput.value;
+			const name = typeNameInput.value.trim();
+			const description = typeDescriptionInput.value.trim();
+			const duplicate = machineTypes.some((machineType) =>
+				machineType.name.toLocaleLowerCase("es") === name.toLocaleLowerCase("es") && machineType.id !== editingId
+			);
+			if (duplicate) {
+				typeNameInput.setCustomValidity("Ya existe un tipo de máquina con este nombre.");
+				typeNameInput.reportValidity();
+				return;
+			}
+
+			const previousTypes = machineTypes;
+			const previousMachines = machines;
+			const existingType = machineTypes.find((machineType) => machineType.id === editingId);
+			const updatedType = { id: editingId || globalThis.crypto?.randomUUID?.() || String(Date.now()), name, description };
+			machineTypes = editingId
+				? machineTypes.map((machineType) => machineType.id === editingId ? updatedType : machineType)
+				: [...machineTypes, updatedType];
+
+			if (existingType && existingType.name !== name) {
+				machines = machines.map((machine) => machine.type === existingType.name ? { ...machine, type: name } : machine);
+			}
+
+			try {
+				localStorage.setItem(TYPE_STORAGE_KEY, JSON.stringify(machineTypes));
+				if (machines !== previousMachines) localStorage.setItem(STORAGE_KEY, JSON.stringify(machines));
+			} catch {
+				machineTypes = previousTypes;
+				machines = previousMachines;
+				showTypeNotice("No fue posible guardar los cambios en este navegador.", "danger");
+				return;
+			}
+
+			resetTypeForm();
+			renderMachineTypes();
+			renderMachines();
+			showTypeNotice(editingId ? "El tipo de máquina se actualizó correctamente." : "El tipo de máquina se registró correctamente.");
+		});
+
+		machineCodeInput.addEventListener("input", () => machineCodeInput.setCustomValidity(""));
+		machinePhotoInput.addEventListener("change", async () => {
+			const [file] = machinePhotoInput.files;
+			if (!file) return;
+			if (!file.type.startsWith("image/")) {
+				showNotice("Selecciona un archivo de imagen.", "warning");
+				machinePhotoInput.value = "";
+				return;
+			}
+			if (file.size > 15 * 1024 * 1024) {
+				showNotice("La fotografía no puede superar los 15 MB.", "warning");
+				machinePhotoInput.value = "";
+				return;
+			}
+
+			photoProcessing = true;
+			submitButton.disabled = true;
+			try {
+				currentPhotoData = await compressPhoto(file);
+				showPhotoPreview(currentPhotoData);
+				hideNotice();
+			} catch (error) {
+				showNotice(error.message, "danger");
+				machinePhotoInput.value = "";
+			} finally {
+				photoProcessing = false;
+				submitButton.disabled = false;
+			}
+		});
+		clearPhotoButton.addEventListener("click", () => {
+			currentPhotoData = "";
+			machinePhotoInput.value = "";
+			showPhotoPreview("");
+		});
+		typeNameInput.addEventListener("input", () => typeNameInput.setCustomValidity(""));
+		machineSearch.addEventListener("input", renderMachines);
+		exportMachinesButton.addEventListener("click", exportMachinesToExcel);
+		typeSearch.addEventListener("input", renderMachineTypes);
+		moduleLinks.forEach((link) => link.addEventListener("click", (event) => {
+			event.preventDefault();
+			showModule(link.dataset.view);
+		}));
+
+		cancelEditButton.addEventListener("click", () => {
+			resetForm();
+			hideNotice();
+		});
+
+		machineList.addEventListener("click", (event) => {
+			const button = event.target.closest("button[data-action]");
+			if (!button) return;
+
+			const machine = machines.find((item) => item.id === button.dataset.id);
+			if (!machine) return;
+
+			if (button.dataset.action === "view-photo") {
+				if (!machine.photoData) return;
+				photoDialogTitle.textContent = `Fotografía: ${machine.code}`;
+				enlargedPhoto.src = machine.photoData;
+				photoDialog.showModal();
+				return;
+			}
+
+			if (button.dataset.action === "edit") {
+				machineIdInput.value = machine.id;
+				machineCodeInput.value = machine.code;
+				machineBrandInput.value = machine.brand;
+				machineTypeInput.value = machine.type;
+				machineCapacityInput.value = machine.capacity;
+				currentPhotoData = machine.photoData || "";
+				machinePhotoInput.value = "";
+				showPhotoPreview(currentPhotoData);
+				formTitle.textContent = "Editar máquina";
+				submitButton.innerHTML = '<i class="bi bi-check2-circle" aria-hidden="true"></i><span>Guardar cambios</span>';
+				cancelEditButton.classList.remove("d-none");
+				hideNotice();
+				machineCodeInput.focus();
+				return;
+			}
+
+			if (button.dataset.action === "delete" && window.confirm(`¿Eliminar la máquina ${machine.code}?`)) {
+				machines = machines.filter((item) => item.id !== machine.id);
+				if (saveMachines()) {
+					renderMachines();
+					showNotice("La máquina se eliminó del inventario.");
+					if (machineIdInput.value === machine.id) resetForm();
+				}
+			}
+		});
+		document.querySelector("#close-photo-dialog").addEventListener("click", () => photoDialog.close());
+		photoDialog.addEventListener("click", (event) => {
+			if (event.target === photoDialog) photoDialog.close();
+		});
+
+		typeCancelEditButton.addEventListener("click", () => {
+			resetTypeForm();
+			hideTypeNotice();
+		});
+
+		typeList.addEventListener("click", (event) => {
+			const button = event.target.closest("button[data-action]");
+			if (!button) return;
+			const machineType = machineTypes.find((item) => item.id === button.dataset.id);
+			if (!machineType) return;
+
+			if (button.dataset.action === "edit-type") {
+				typeIdInput.value = machineType.id;
+				typeNameInput.value = machineType.name;
+				typeDescriptionInput.value = machineType.description;
+				typeFormTitle.textContent = "Editar tipo de máquina";
+				typeSubmitButton.innerHTML = '<i class="bi bi-check2-circle" aria-hidden="true"></i><span>Guardar cambios</span>';
+				typeCancelEditButton.classList.remove("d-none");
+				hideTypeNotice();
+				typeNameInput.focus();
+				return;
+			}
+
+			if (button.dataset.action === "delete-type") {
+				if (machines.some((machine) => machine.type === machineType.name)) {
+					showTypeNotice("No se puede eliminar: hay máquinas registradas con este tipo.", "warning");
+					return;
+				}
+				if (!window.confirm(`¿Eliminar el tipo de máquina ${machineType.name}?`)) return;
+				const previousTypes = machineTypes;
+				machineTypes = machineTypes.filter((item) => item.id !== machineType.id);
+				if (saveMachineTypes()) {
+					renderMachineTypes();
+					showTypeNotice("El tipo de máquina se eliminó correctamente.");
+					if (typeIdInput.value === machineType.id) resetTypeForm();
+				} else {
+					machineTypes = previousTypes;
+					renderMachineTypes();
+				}
+			}
+		});
+
+		document.querySelector("#today").textContent = new Intl.DateTimeFormat("es", {
+			day: "numeric",
+			month: "long",
+			year: "numeric"
+		}).format(new Date());
+
+		renderMachineTypes();
+		renderMachines();
+	</script>
+</body>
+</html>
