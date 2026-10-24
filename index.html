@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#20372d">
-	<title>Control Industrial | Máquinas</title>
+	<meta name="theme-color" content="#252c34">
+	<title>Control Industrial | Inicio</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -12,19 +12,19 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
 	<style>
 		:root {
-			--forest: #20372d;
-			--forest-deep: #172a22;
-			--green: #287355;
-			--green-dark: #205c43;
-			--green-pale: #e7f1eb;
-			--ink: #202922;
-			--muted: #758078;
-			--line: #e3e8e2;
-			--paper: #f4f6f2;
+			--graphite: #252c34;
+			--steel: #455564;
+			--steel-dark: #33414e;
+			--steel-pale: #e8edf1;
+			--ink: #252e38;
+			--muted: #606e7b;
+			--line: #dce2e8;
+			--paper: #f0f3f5;
 			--white: #fff;
-			--amber: #d59138;
+			--amber: #f2ad32;
+			--amber-hover: #df9820;
 			--red: #a43f36;
-			--shadow: 0 12px 32px rgb(29 49 39 / 6%);
+			--shadow: 0 12px 32px rgb(25 35 45 / 7%);
 		}
 
 		* { box-sizing: border-box; }
@@ -35,7 +35,7 @@
 			margin: 0;
 			color: var(--ink);
 			background-color: var(--paper);
-			background-image: radial-gradient(#dce4db 0.7px, transparent 0.7px);
+			background-image: radial-gradient(#d7dfe6 0.7px, transparent 0.7px);
 			background-size: 16px 16px;
 			font-family: "DM Sans", sans-serif;
 		}
@@ -52,9 +52,12 @@
 			width: 248px;
 			flex-direction: column;
 			padding: 28px 18px 20px;
-			color: #edf3ee;
-			background: var(--forest);
+			color: #eef2f6;
+			background: var(--graphite);
+			transition: transform .2s ease;
 		}
+
+		.app-shell.menu-collapsed .sidebar { transform: translateX(-100%); }
 
 		.brand {
 			display: flex;
@@ -73,17 +76,17 @@
 			place-items: center;
 			border: 1px solid rgb(255 255 255 / 18%);
 			border-radius: 10px;
-			color: #f2bd69;
+			color: var(--amber);
 			background: rgb(255 255 255 / 7%);
 			font-size: 19px;
 		}
 
 		.brand-name { display: block; font-size: 14px; font-weight: 700; letter-spacing: 0; }
-		.brand-caption { display: block; margin-top: 2px; color: #aab9ae; font-size: 11px; }
+		.brand-caption { display: block; margin-top: 2px; color: #aebbc7; font-size: 11px; }
 
 		.nav-label {
 			margin: 0 10px 10px;
-			color: #aab9ae;
+			color: #aebbc7;
 			font-size: 10px;
 			font-weight: 700;
 			letter-spacing: 1.2px;
@@ -100,26 +103,26 @@
 			padding: 0 11px;
 			border: 1px solid transparent;
 			border-radius: 7px;
-			color: #d5dfd7;
+			color: #d7dfe7;
 			font-size: 13px;
 			text-decoration: none;
 		}
 
-		.module-link i { width: 18px; color: #b5c3b8; font-size: 16px; text-align: center; }
-		.module-link.active { border-color: rgb(255 255 255 / 9%); color: #fff; background: rgb(255 255 255 / 10%); }
-		.module-link.active i { color: #f2bd69; }
+		.module-link i { width: 18px; color: #bbc6d0; font-size: 16px; text-align: center; }
+		.module-link.active { border-color: rgb(242 173 50 / 35%); color: #fff; background: rgb(242 173 50 / 12%); }
+		.module-link.active i { color: var(--amber); }
 		.module-link.disabled { cursor: default; opacity: .6; }
 		.module-view.d-none { display: none !important; }
 		.type-table { min-width: 480px; margin: 0; }
-		.type-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #778279; background: #fafbf9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
-		.type-table tbody td { padding: 13px 14px; border-bottom-color: #edf0ec; color: #364139; font-size: 11px; vertical-align: middle; }
+		.type-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #606e7b; background: #f5f7f9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
+		.type-table tbody td { padding: 13px 14px; border-bottom-color: #edf0f3; color: #364350; font-size: 11px; vertical-align: middle; }
 		.type-table tbody tr:last-child td { border-bottom: 0; }
 		.type-name { font-weight: 700; }
-		.type-description { color: #59665c; }
+		.type-description { color: #596977; }
 
 		.module-soon {
 			margin-left: auto;
-			color: #c2cec4;
+			color: #c6cfd8;
 			font-size: 9px;
 			white-space: nowrap;
 		}
@@ -131,23 +134,101 @@
 			margin-top: auto;
 			padding: 16px 10px 0;
 			border-top: 1px solid rgb(255 255 255 / 12%);
-			color: #b5c3b8;
+			color: #bbc6d0;
 			font-size: 11px;
 		}
 
 		.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #83c69b; }
 
-		.main-content { min-height: 100vh; margin-left: 248px; }
+		.main-content { min-height: 100vh; margin-left: 248px; transition: margin-left .2s ease; }
+		.app-shell.menu-collapsed .main-content { margin-left: 0; }
+
+		.home-view {
+			display: flex;
+			min-height: calc(100vh - 64px);
+			min-height: calc(100dvh - 64px);
+			align-items: center;
+			padding: clamp(28px, 5vw, 64px);
+			background-color: #f7f9fb;
+			background-image: url("assets/inicio-industrial.png");
+			background-repeat: no-repeat;
+			background-position: center center;
+			background-size: cover;
+		}
+
+		.home-view[hidden] { display: none; }
+		.home-content { width: min(580px, 58%); }
+		.home-title { margin: 0; color: var(--ink); font-size: clamp(26px, 3vw, 36px); font-weight: 700; }
+		.home-description { margin: 8px 0 22px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+		.home-module-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+		.home-module-button {
+			display: flex;
+			min-height: 78px;
+			align-items: center;
+			gap: 12px;
+			padding: 13px 15px;
+			border: 1px solid rgb(204 215 224 / 90%);
+			border-radius: 8px;
+			color: var(--ink);
+			background: rgb(255 255 255 / 92%);
+			box-shadow: 0 5px 16px rgb(37 46 56 / 6%);
+			text-align: left;
+			transition: border-color .15s ease, background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+		}
+		.home-module-button:not(:disabled) { cursor: pointer; }
+		.home-module-button:not(:disabled):hover {
+			transform: translateY(-2px);
+			border-color: #d9a33b;
+			background: #fff;
+			box-shadow: 0 9px 22px rgb(37 46 56 / 12%);
+		}
+		.home-module-button:focus-visible { outline: 3px solid rgb(242 173 50 / 60%); outline-offset: 2px; }
+		.home-module-button:disabled { cursor: default; color: #76838e; background: rgb(246 248 250 / 90%); }
+		.home-module-icon {
+			display: grid;
+			width: 38px;
+			height: 38px;
+			flex: 0 0 38px;
+			place-items: center;
+			border-radius: 7px;
+			color: var(--steel);
+			background: var(--steel-pale);
+			font-size: 17px;
+		}
+		.home-module-button:not(:disabled):hover .home-module-icon { color: #80560f; background: #fff1d2; }
+		.home-module-button:disabled .home-module-icon { color: #76838e; background: #e9edf0; }
+		.home-module-label { display: block; font-size: 12px; font-weight: 700; }
+		.home-module-status { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+		.home-module-button:disabled .home-module-status { color: #76838e; }
 
 		.topbar {
 			display: flex;
 			min-height: 64px;
 			align-items: center;
 			justify-content: space-between;
+			gap: 16px;
 			padding: 0 42px;
 			border-bottom: 1px solid var(--line);
 			background: rgb(255 255 255 / 88%);
 		}
+
+		.topbar-start { display: flex; min-width: 0; align-items: center; gap: 14px; }
+		.menu-toggle {
+			display: grid;
+			width: 38px;
+			height: 38px;
+			flex: 0 0 38px;
+			place-items: center;
+			border: 1px solid var(--line);
+			border-radius: 7px;
+			color: var(--steel-dark);
+			background: var(--white);
+			cursor: pointer;
+			font-size: 18px;
+		}
+		.menu-toggle:hover { border-color: #b9c5ce; background: #f5f7f9; }
+		.menu-toggle:focus-visible { outline: 3px solid rgb(242 173 50 / 45%); outline-offset: 2px; }
+		.menu-backdrop { display: none; }
 
 		.breadcrumb-line { color: var(--muted); font-size: 12px; }
 		.breadcrumb-line strong { color: var(--ink); font-weight: 600; }
@@ -163,9 +244,11 @@
 			margin-bottom: 27px;
 		}
 
+		.module-home-button { display: none; }
+
 		.eyebrow {
 			margin-bottom: 7px;
-			color: var(--green);
+			color: var(--steel);
 			font-size: 10px;
 			font-weight: 700;
 			letter-spacing: 1.25px;
@@ -193,8 +276,8 @@
 			flex: 0 0 34px;
 			place-items: center;
 			border-radius: 7px;
-			color: var(--green);
-			background: var(--green-pale);
+			color: var(--steel);
+			background: var(--steel-pale);
 			font-size: 16px;
 		}
 
@@ -226,8 +309,8 @@
 			flex: 0 0 32px;
 			place-items: center;
 			border-radius: 7px;
-			color: var(--green);
-			background: var(--green-pale);
+			color: var(--steel);
+			background: var(--steel-pale);
 			font-size: 15px;
 		}
 
@@ -235,19 +318,19 @@
 		.surface-description { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
 		.form-body { padding: 19px 20px 20px; }
 
-		.form-label { margin-bottom: 6px; color: #3c4940; font-size: 11px; font-weight: 700; }
+		.form-label { margin-bottom: 6px; color: #3c4b59; font-size: 11px; font-weight: 700; }
 		.required-mark { color: var(--red); }
 
 		.form-control {
 			min-height: 40px;
-			border-color: #dce3dc;
+			border-color: #d3dce4;
 			border-radius: 5px;
 			color: var(--ink);
 			font-size: 12px;
 		}
 
-		.form-control::placeholder { color: #a4ada5; }
-		.form-control:focus { border-color: #71a58b; box-shadow: 0 0 0 3px rgb(40 115 85 / 12%); }
+		.form-control::placeholder { color: #73808c; }
+		.form-control:focus { border-color: #657c90; box-shadow: 0 0 0 3px rgb(69 85 100 / 16%); }
 		.code-input { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
 		.field-help { margin-top: 5px; color: var(--muted); font-size: 10px; }
 		.field-block { margin-bottom: 15px; }
@@ -258,17 +341,18 @@
 			align-items: center;
 			justify-content: center;
 			gap: 8px;
-			border: 1px solid var(--green);
+			border: 1px solid var(--amber);
 			border-radius: 5px;
-			color: #fff;
-			background: var(--green);
+			color: var(--graphite);
+			background: var(--amber);
 			font-size: 12px;
 			font-weight: 700;
 		}
 
-		.btn-primary-action:hover, .btn-primary-action:focus-visible { border-color: var(--green-dark); color: #fff; background: var(--green-dark); }
-		.btn-secondary-action { min-height: 38px; border-color: var(--line); color: #4f5b52; background: #fff; font-size: 11px; }
-		.btn-secondary-action:hover { border-color: #c4cec5; color: var(--ink); background: #f7f9f6; }
+		.btn-primary-action:hover, .btn-primary-action:focus-visible { border-color: var(--amber-hover); color: var(--graphite); background: var(--amber-hover); }
+		.btn-primary-action:focus-visible { outline: 2px solid var(--steel); outline-offset: 3px; box-shadow: none; }
+		.btn-secondary-action { min-height: 38px; border-color: var(--line); color: #4f5f6d; background: #fff; font-size: 11px; }
+		.btn-secondary-action:hover { border-color: #bfcbd5; color: var(--ink); background: #f3f6f8; }
 		.form-actions { display: flex; gap: 8px; margin-top: 21px; }
 		.form-actions .btn-primary-action { flex: 1; }
 		.notice { margin: 0 20px 16px; font-size: 11px; }
@@ -286,32 +370,32 @@
 		.list-tools { display: flex; align-items: center; gap: 8px; }
 		.export-button { min-height: 34px; padding: 0 11px; white-space: nowrap; }
 		.export-button:disabled { cursor: not-allowed; opacity: .55; }
-		.list-count { display: inline-flex; min-width: 22px; height: 22px; align-items: center; justify-content: center; margin-left: 6px; padding: 0 6px; border-radius: 20px; color: var(--green-dark); background: var(--green-pale); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+		.list-count { display: inline-flex; min-width: 22px; height: 22px; align-items: center; justify-content: center; margin-left: 6px; padding: 0 6px; border-radius: 20px; color: var(--steel-dark); background: var(--steel-pale); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
 		.search-wrap { position: relative; width: min(230px, 52%); }
-		.search-wrap > i { position: absolute; top: 50%; left: 11px; color: #89948b; font-size: 13px; transform: translateY(-50%); }
+		.search-wrap > i { position: absolute; top: 50%; left: 11px; color: #72818e; font-size: 13px; transform: translateY(-50%); }
 		.search-input { min-height: 34px; padding-left: 32px; font-size: 11px; }
 		.table-wrap { overflow-x: auto; }
 
 		.machine-table { min-width: 560px; margin: 0; }
-		.machine-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #778279; background: #fafbf9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
-		.machine-table tbody td { padding: 13px 14px; border-bottom-color: #edf0ec; color: #364139; font-size: 11px; vertical-align: middle; }
+		.machine-table thead th { padding: 11px 14px; border-bottom-color: var(--line); color: #606e7b; background: #f5f7f9; font-size: 9px; font-weight: 700; letter-spacing: .65px; text-transform: uppercase; white-space: nowrap; }
+		.machine-table tbody td { padding: 13px 14px; border-bottom-color: #edf0f3; color: #364350; font-size: 11px; vertical-align: middle; }
 		.machine-table tbody tr:last-child td { border-bottom: 0; }
-		.machine-code { color: var(--green-dark); font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; white-space: nowrap; }
+		.machine-code { color: var(--steel-dark); font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 600; white-space: nowrap; }
 		.machine-brand { font-weight: 700; }
-		.machine-type { color: #59665c; }
-		.machine-capacity { color: #59665c; white-space: nowrap; }
+		.machine-type { color: #596977; }
+		.machine-capacity { color: #596977; white-space: nowrap; }
 		.machine-table { min-width: 620px; }
-		.photo-thumb-button { display: grid; width: 42px; height: 42px; place-items: center; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 5px; color: #768278; background: #f7f9f6; font-size: 16px; }
-		.photo-thumb-button:not(:disabled):hover { border-color: #9cb6a3; color: var(--green-dark); }
+		.photo-thumb-button { display: grid; width: 42px; height: 42px; place-items: center; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 5px; color: #667786; background: #f3f6f8; font-size: 16px; }
+		.photo-thumb-button:not(:disabled):hover { border-color: #8fa4b6; color: var(--steel-dark); }
 		.photo-thumb-button:disabled { cursor: default; opacity: .65; }
 		.photo-thumb-button img { width: 100%; height: 100%; object-fit: cover; }
 		.photo-preview { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 		.photo-preview img { width: 58px; height: 58px; border: 1px solid var(--line); border-radius: 5px; object-fit: cover; }
 		.photo-dialog { width: min(900px, calc(100vw - 32px)); max-width: none; max-height: calc(100vh - 32px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #fff; box-shadow: 0 24px 80px rgb(0 0 0 / 25%); }
-		.photo-dialog::backdrop { background: rgb(15 27 20 / 76%); }
+		.photo-dialog::backdrop { background: rgb(20 27 35 / 76%); }
 		.photo-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
 		.photo-dialog-title { margin: 0; font-size: 13px; font-weight: 700; }
-		.photo-dialog-image { display: block; width: 100%; max-height: calc(100vh - 100px); object-fit: contain; background: #f4f6f2; }
+		.photo-dialog-image { display: block; width: 100%; max-height: calc(100vh - 100px); object-fit: contain; background: var(--paper); }
 		.photo-clear-button { min-height: 30px; padding: 3px 8px; font-size: 10px; }
 		.row-actions { display: flex; justify-content: flex-end; gap: 4px; }
 
@@ -322,17 +406,119 @@
 			place-items: center;
 			border: 1px solid transparent;
 			border-radius: 5px;
-			color: #637066;
+			color: #5b6d7c;
 			background: transparent;
 			font-size: 13px;
 		}
 
-		.icon-button:hover { border-color: var(--line); color: var(--green-dark); background: #f6f8f5; }
+		.icon-button:hover { border-color: var(--line); color: var(--steel-dark); background: #f1f4f7; }
 		.icon-button.delete:hover { color: var(--red); background: #fbf1ef; }
 		.empty-cell { padding: 42px 20px !important; text-align: center; }
-		.empty-icon { display: block; margin-bottom: 9px; color: #aeb9af; font-size: 24px; }
-		.empty-title { display: block; color: #465249; font-size: 12px; font-weight: 700; }
+		.empty-icon { display: block; margin-bottom: 9px; color: #9baab7; font-size: 24px; }
+		.empty-title { display: block; color: #425362; font-size: 12px; font-weight: 700; }
 		.empty-copy { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+
+		.welcome-screen {
+			display: grid;
+			min-height: 100vh;
+			place-items: center;
+			padding: 36px 20px;
+		}
+		.welcome-screen[hidden] { display: none; }
+
+		.welcome-showcase {
+			position: absolute;
+			top: 50%;
+			right: 16px;
+			z-index: 0;
+			display: none;
+			width: 480px;
+			transform: translateY(-50%);
+		}
+		.welcome-content { position: relative; z-index: 1; pointer-events: none; }
+		.welcome-button, .welcome-local-note { pointer-events: auto; }
+		.welcome-showcase-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; }
+		.welcome-showcase-image {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			opacity: 0;
+			transition: opacity .7s ease;
+			user-select: none;
+		}
+		.welcome-showcase-image.active { opacity: .6; }
+		.welcome-showcase-dots { display: flex; justify-content: center; gap: 8px; margin-top: 6px; }
+		.welcome-showcase-dot {
+			width: 8px;
+			height: 8px;
+			padding: 0;
+			border: 0;
+			border-radius: 50%;
+			background: #c9d2da;
+			cursor: pointer;
+			transition: background-color .2s ease, transform .2s ease;
+		}
+		.welcome-showcase-dot:hover { background: #9fb0be; }
+		.welcome-showcase-dot.active { background: var(--amber); transform: scale(1.25); }
+		.welcome-showcase-dot:focus-visible { outline: 2px solid var(--steel); outline-offset: 3px; }
+		@media (min-width: 1200px) {
+			.welcome-card { width: min(1120px, 100%); }
+			.welcome-showcase { display: block; }
+		}
+
+		.welcome-meta {
+			position: fixed;
+			bottom: 14px;
+			left: 18px;
+			z-index: 1;
+			display: grid;
+			gap: 2px;
+			color: var(--muted);
+			font-size: 11px;
+			line-height: 1.3;
+			opacity: .85;
+			pointer-events: none;
+		}
+		.welcome-clock { display: flex; align-items: baseline; gap: 8px; }
+		.welcome-clock-time { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 500; }
+		.welcome-clock-date { text-transform: capitalize; }
+		.welcome-visits { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+		.welcome-visits i { font-size: 11px; }
+		.welcome-visits-count { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+
+		.welcome-card {
+			position: relative;
+			width: min(920px, 100%);
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--white);
+			box-shadow: 0 24px 70px rgb(25 35 45 / 12%);
+		}
+
+		.welcome-card::before {
+			position: absolute;
+			inset: 0 0 auto;
+			height: 5px;
+			background: var(--amber);
+			content: "";
+		}
+
+		.welcome-content { padding: clamp(28px, 6vw, 62px); }
+		.welcome-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+		.welcome-brand .brand-mark { border-color: var(--line); color: var(--amber-hover); background: var(--graphite); }
+		.welcome-brand .brand-name { color: var(--ink); font-size: 15px; }
+		.welcome-brand .brand-caption { color: var(--muted); }
+		.welcome-eyebrow { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; color: var(--steel); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+		.welcome-eyebrow::before { width: 22px; height: 2px; background: var(--amber); content: ""; }
+		.welcome-title { max-width: 640px; font-size: clamp(34px, 6vw, 56px); line-height: 1.08; letter-spacing: -.8px; }
+		.welcome-description { max-width: 560px; margin: 17px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+		.welcome-actions { display: flex; align-items: center; gap: 18px; margin-top: 30px; }
+		.welcome-button { min-height: 46px; padding: 0 18px; }
+		.welcome-local-note { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+		.welcome-local-note i { color: #4d9165; }
 
 		@media (max-width: 1050px) {
 			.sidebar { width: 218px; }
@@ -344,16 +530,55 @@
 		}
 
 		@media (max-width: 800px) {
-			.sidebar { position: static; width: 100%; padding: 13px 18px 12px; }
+			.sidebar {
+				position: fixed;
+				inset: 0 auto 0 0;
+				z-index: 20;
+				width: min(300px, 86vw);
+				padding: 22px 18px 20px;
+				box-shadow: 12px 0 30px rgb(0 0 0 / 20%);
+				transform: translateX(-100%);
+			}
+			.app-shell.menu-open .sidebar { transform: translateX(0); }
 			.brand { padding: 0 4px 12px; }
 			.brand-mark { width: 34px; height: 34px; flex-basis: 34px; }
-			.nav-label, .sidebar-foot { display: none; }
-			.module-nav { display: flex; gap: 5px; overflow-x: auto; padding-top: 7px; border-top: 1px solid rgb(255 255 255 / 12%); }
-			.module-link { min-height: 37px; flex: 0 0 auto; padding: 0 9px; font-size: 11px; }
+			.nav-label { margin-top: 12px; }
+			.module-nav { display: grid; gap: 5px; padding-top: 7px; border-top: 1px solid rgb(255 255 255 / 12%); }
+			.module-link { min-height: 44px; flex: initial; padding: 0 11px; font-size: 13px; }
 			.module-link i { font-size: 14px; }
-			.module-soon { display: none; }
+			.module-soon { display: initial; }
+			.sidebar-foot { display: flex; }
+			.menu-backdrop {
+				position: fixed;
+				inset: 0;
+				z-index: 15;
+				display: none;
+				border: 0;
+				background: rgb(19 26 32 / 48%);
+			}
+			.app-shell.menu-open .menu-backdrop { display: block; }
 			.main-content { min-height: auto; margin-left: 0; }
+			.app-shell.menu-collapsed .main-content { margin-left: 0; }
 			.topbar { min-height: 48px; padding: 0 22px; }
+			.topbar-start { gap: 10px; }
+			.menu-toggle { width: 34px; height: 34px; flex-basis: 34px; font-size: 16px; }
+			.home-view {
+				align-items: flex-start;
+				min-height: calc(100vh - 48px);
+				min-height: calc(100dvh - 48px);
+				padding: 34px clamp(18px, 5vw, 44px) clamp(230px, 38vh, 330px);
+				background-position: right bottom;
+				background-size: auto 48%;
+			}
+			.home-content { width: min(560px, 100%); }
+			.module-home-button {
+				display: flex;
+				width: fit-content;
+				align-items: center;
+				gap: 7px;
+				margin-top: 12px;
+				margin-left: auto;
+			}
 			.workspace { padding: 27px 22px 40px; }
 			.content-grid { grid-template-columns: minmax(0, 1fr); }
 			.form-body { padding: 18px 20px 20px; }
@@ -361,6 +586,27 @@
 
 		@media (max-width: 520px) {
 			.topbar { padding: 0 16px; }
+			.breadcrumb-line { font-size: 11px; }
+			.welcome-screen { padding: 16px 16px 44px; }
+			.welcome-meta { bottom: 12px; left: 16px; }
+			.welcome-clock { flex-wrap: wrap; gap: 2px 8px; }
+			.welcome-brand { margin-bottom: 38px; }
+			.welcome-title { font-size: 36px; }
+			.welcome-description { font-size: 13px; }
+			.welcome-actions { align-items: flex-start; flex-direction: column; gap: 13px; }
+			.home-view {
+				min-height: max(560px, calc(100vh - 48px));
+				min-height: max(560px, calc(100svh - 48px));
+				padding: 26px 15px 230px;
+				background-size: auto 38%;
+			}
+			.home-title { font-size: 26px; }
+			.home-description { margin-bottom: 16px; font-size: 12px; }
+			.home-module-grid { gap: 8px; }
+			.home-module-button { min-height: 70px; gap: 8px; padding: 10px; }
+			.home-module-icon { width: 32px; height: 32px; flex-basis: 32px; font-size: 15px; }
+			.home-module-label { font-size: 11px; }
+			.home-module-status { font-size: 9px; }
 			.workspace { padding: 22px 14px 32px; }
 			.page-heading { align-items: flex-start; flex-direction: column; gap: 15px; margin-bottom: 19px; }
 			h1 { font-size: 25px; }
@@ -370,11 +616,59 @@
 			.search-wrap { width: auto; flex: 1; }
 			.machine-table thead th, .machine-table tbody td { padding-right: 10px; padding-left: 10px; }
 		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.sidebar, .main-content, .home-module-button, .welcome-showcase-image { transition: none; }
+		}
 	</style>
 </head>
 <body>
-	<div class="app-shell">
-		<aside class="sidebar" aria-label="Navegación principal">
+	<section class="welcome-screen" id="welcome-screen" aria-labelledby="welcome-title">
+		<div class="welcome-card">
+			<div class="welcome-content">
+				<div class="welcome-brand" aria-label="Control Industrial">
+					<span class="brand-mark"><i class="bi bi-gear-wide-connected" aria-hidden="true"></i></span>
+					<span>
+						<span class="brand-name">Control Industrial</span>
+						<span class="brand-caption">Gestión de planta</span>
+					</span>
+				</div>
+				<div class="welcome-eyebrow">Sistema de gestión industrial</div>
+				<h1 class="welcome-title" id="welcome-title" tabindex="-1">Control claro para tu planta.</h1>
+				<p class="welcome-description">Administra el inventario de máquinas y organiza los tipos de equipo desde un solo lugar, de forma sencilla y ordenada.</p>
+				<div class="welcome-actions">
+					<button class="btn-primary-action welcome-button" id="enter-system" type="button">
+						<span>Entrar al sistema</span><i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</button>
+					<span class="welcome-local-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Tus datos se guardan en este navegador</span>
+				</div>
+			</div>
+			<div class="welcome-showcase" id="welcome-showcase" role="group" aria-label="Ilustraciones del sistema">
+				<div class="welcome-showcase-stage">
+					<img class="welcome-showcase-image active" src="assets/bienvenida-equipos.png" alt="Organización de equipos industriales en una línea de transporte" decoding="async">
+					<img class="welcome-showcase-image" src="assets/bienvenida-inventario.png" alt="Inventario industrial con motor, bomba y repuestos" decoding="async" loading="lazy">
+					<img class="welcome-showcase-image" src="assets/bienvenida-mantenimiento.png" alt="Mantenimiento preventivo de un motor y una bomba" decoding="async" loading="lazy">
+				</div>
+				<div class="welcome-showcase-dots">
+					<button class="welcome-showcase-dot active" type="button" aria-label="Mostrar ilustración 1"></button>
+					<button class="welcome-showcase-dot" type="button" aria-label="Mostrar ilustración 2"></button>
+					<button class="welcome-showcase-dot" type="button" aria-label="Mostrar ilustración 3"></button>
+				</div>
+			</div>
+		</div>
+		<div class="welcome-meta">
+			<div class="welcome-clock" aria-hidden="true">
+				<span class="welcome-clock-date" id="welcome-date"></span>
+				<time class="welcome-clock-time" id="welcome-time"></time>
+			</div>
+			<div class="welcome-visits" id="welcome-visits" role="status" hidden>
+				<i class="bi bi-people" aria-hidden="true"></i>
+				<span>Visitas: <span class="welcome-visits-count" id="welcome-visits-count">0</span></span>
+			</div>
+		</div>
+	</section>
+	<div class="app-shell" id="app-shell" hidden>
+		<aside class="sidebar" id="main-menu" aria-label="Navegación principal">
 			<a class="brand" href="#maquinas" aria-label="Control Industrial, inicio">
 				<span class="brand-mark"><i class="bi bi-gear-wide-connected" aria-hidden="true"></i></span>
 				<span>
@@ -385,11 +679,11 @@
 
 			<p class="nav-label">Módulos</p>
 			<nav class="module-nav" aria-label="Módulos del sistema">
-				<a class="module-link active" href="#maquinas" data-view="machines" aria-current="page">
-					<i class="bi bi-cpu" aria-hidden="true"></i><span>Máquinas</span>
-				</a>
 				<a class="module-link" href="#tipos-maquina" data-view="types">
 					<i class="bi bi-tags" aria-hidden="true"></i><span>Módulo de tipo de máquina</span>
+				</a>
+				<a class="module-link" href="#maquinas" data-view="machines">
+					<i class="bi bi-cpu" aria-hidden="true"></i><span>Máquinas</span>
 				</a>
 				<span class="module-link disabled" aria-disabled="true">
 					<i class="bi bi-box-seam" aria-hidden="true"></i><span>Repuestos</span><span class="module-soon">Próximamente</span>
@@ -401,19 +695,53 @@
 
 			<div class="sidebar-foot"><span class="status-dot" aria-hidden="true"></span>Inventario local activo</div>
 		</aside>
+		<button class="menu-backdrop" id="menu-backdrop" type="button" aria-label="Cerrar menú" tabindex="-1"></button>
 
 		<main class="main-content">
 			<header class="topbar">
-				<div class="breadcrumb-line">Inventario <span aria-hidden="true">/</span> <strong id="current-module">Máquinas</strong></div>
+				<div class="topbar-start">
+					<button class="menu-toggle" id="menu-toggle" type="button" aria-controls="main-menu" aria-expanded="true" aria-label="Ocultar menú">
+						<i class="bi bi-list" aria-hidden="true"></i>
+					</button>
+					<div class="breadcrumb-line">Inventario <span id="breadcrumb-separator" aria-hidden="true" hidden>/</span> <strong id="current-module" hidden></strong></div>
+				</div>
 				<time class="today" id="today"></time>
 			</header>
 
-			<div class="workspace module-view" id="machines-view">
+			<section class="home-view" id="home-view" aria-label="Inicio del sistema">
+				<div class="home-content">
+					<h1 class="home-title">Selecciona un módulo</h1>
+					<p class="home-description">Accede a las herramientas de gestión de tu planta.</p>
+					<nav class="home-module-grid" aria-label="Accesos a módulos">
+						<button class="home-module-button" type="button" data-home-view="machines">
+							<span class="home-module-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
+							<span><span class="home-module-label">Máquinas</span><span class="home-module-status">Registrar y consultar equipos</span></span>
+						</button>
+						<button class="home-module-button" type="button" data-home-view="types">
+							<span class="home-module-icon"><i class="bi bi-tags" aria-hidden="true"></i></span>
+							<span><span class="home-module-label">Módulo de tipo de máquina</span><span class="home-module-status">Gestionar tipos disponibles</span></span>
+						</button>
+						<button class="home-module-button" type="button" disabled>
+							<span class="home-module-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+							<span><span class="home-module-label">Repuestos</span><span class="home-module-status">Próximamente</span></span>
+						</button>
+						<button class="home-module-button" type="button" disabled>
+							<span class="home-module-icon"><i class="bi bi-wrench-adjustable" aria-hidden="true"></i></span>
+							<span><span class="home-module-label">Mantenimientos</span><span class="home-module-status">Próximamente</span></span>
+						</button>
+					</nav>
+				</div>
+			</section>
+
+			<div class="workspace module-view d-none" id="machines-view">
 				<section class="page-heading" aria-labelledby="page-title">
 					<div>
 						<div class="eyebrow">Registro de activos</div>
 						<h1 id="page-title">Máquinas</h1>
 						<p class="page-subtitle">Consulta y administra los equipos industriales de tu planta.</p>
+						<button class="btn btn-secondary-action module-home-button" type="button" data-return-home>
+							<i class="bi bi-house-door" aria-hidden="true"></i><span>Volver al inicio</span>
+						</button>
 					</div>
 					<div class="inventory-summary" aria-live="polite">
 						<span class="summary-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
@@ -513,6 +841,9 @@
 						<div class="eyebrow">Catálogo de configuración</div>
 						<h1 id="types-page-title">Tipos de máquina</h1>
 						<p class="page-subtitle">Define los tipos disponibles y descríbelos para el inventario.</p>
+						<button class="btn btn-secondary-action module-home-button" type="button" data-return-home>
+							<i class="bi bi-house-door" aria-hidden="true"></i><span>Volver al inicio</span>
+						</button>
 					</div>
 					<div class="inventory-summary" aria-live="polite">
 						<span class="summary-icon"><i class="bi bi-tags" aria-hidden="true"></i></span>
@@ -584,6 +915,8 @@
 	<script>
 		const STORAGE_KEY = "control-industrial-maquinas-v1";
 		const TYPE_STORAGE_KEY = "control-industrial-tipos-maquina-v1";
+		const VISITS_STORAGE_KEY = "control-industrial-visitas-v1";
+		const VISIT_SESSION_KEY = "control-industrial-visita-registrada";
 		const machineForm = document.querySelector("#machine-form");
 		const machineList = document.querySelector("#machine-list");
 		const machineIdInput = document.querySelector("#machine-id");
@@ -618,15 +951,59 @@
 		const typeSubmitButton = document.querySelector("#type-submit-button");
 		const typeCancelEditButton = document.querySelector("#type-cancel-edit");
 		const typeNotice = document.querySelector("#type-notice");
+		const welcomeScreen = document.querySelector("#welcome-screen");
+		const enterSystemButton = document.querySelector("#enter-system");
+		const homeView = document.querySelector("#home-view");
 		const machinesView = document.querySelector("#machines-view");
 		const typesView = document.querySelector("#types-view");
 		const currentModule = document.querySelector("#current-module");
+		const breadcrumbSeparator = document.querySelector("#breadcrumb-separator");
 		const moduleLinks = document.querySelectorAll(".module-link[data-view]");
+		const homeModuleButtons = document.querySelectorAll("[data-home-view]");
+		const returnHomeButtons = document.querySelectorAll("[data-return-home]");
+		const appShell = document.querySelector(".app-shell");
+		const sidebar = document.querySelector("#main-menu");
+		const menuToggle = document.querySelector("#menu-toggle");
+		const menuBackdrop = document.querySelector("#menu-backdrop");
+		const mobileMenuQuery = window.matchMedia("(max-width: 800px)");
 
 		let machines = loadMachines();
 		let machineTypes = loadMachineTypes();
 		let currentPhotoData = "";
 		let photoProcessing = false;
+
+		enterSystemButton.addEventListener("click", () => {
+			welcomeScreen.hidden = true;
+			appShell.hidden = false;
+			showModule(null);
+			menuToggle.focus();
+		});
+
+		function setMenuOpen(isOpen) {
+			const isMobile = mobileMenuQuery.matches;
+			appShell.classList.toggle("menu-open", isMobile && isOpen);
+			appShell.classList.toggle("menu-collapsed", !isMobile && !isOpen);
+			sidebar.inert = !isOpen;
+			menuToggle.setAttribute("aria-expanded", String(isOpen));
+			menuToggle.setAttribute("aria-label", isOpen ? "Ocultar menú" : "Mostrar menú");
+			menuToggle.querySelector("i").className = isMobile && isOpen ? "bi bi-x-lg" : "bi bi-list";
+		}
+
+		setMenuOpen(!mobileMenuQuery.matches);
+		mobileMenuQuery.addEventListener("change", () => setMenuOpen(!mobileMenuQuery.matches));
+		menuToggle.addEventListener("click", () => {
+			setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+		});
+		menuBackdrop.addEventListener("click", () => {
+			setMenuOpen(false);
+			menuToggle.focus();
+		});
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && mobileMenuQuery.matches && menuToggle.getAttribute("aria-expanded") === "true") {
+				setMenuOpen(false);
+				menuToggle.focus();
+			}
+		});
 
 		function loadMachines() {
 			try {
@@ -766,12 +1143,19 @@
 
 		function showModule(view) {
 			const showTypes = view === "types";
-			machinesView.classList.toggle("d-none", showTypes);
+			const showMachines = view === "machines";
+			const hasActiveModule = showTypes || showMachines;
+			homeView.hidden = hasActiveModule;
+			machinesView.classList.toggle("d-none", !showMachines);
 			typesView.classList.toggle("d-none", !showTypes);
-			currentModule.textContent = showTypes ? "Módulo de tipo de máquina" : "Máquinas";
-			document.title = showTypes ? "Control Industrial | Tipos de máquina" : "Control Industrial | Máquinas";
+			currentModule.textContent = showTypes ? "Módulo de tipo de máquina" : showMachines ? "Máquinas" : "";
+			currentModule.hidden = !hasActiveModule;
+			breadcrumbSeparator.hidden = !hasActiveModule;
+			document.title = showTypes
+				? "Control Industrial | Tipos de máquina"
+				: showMachines ? "Control Industrial | Máquinas" : "Control Industrial | Inicio";
 			for (const link of moduleLinks) {
-				const isActive = link.dataset.view === view;
+				const isActive = hasActiveModule && link.dataset.view === view;
 				link.classList.toggle("active", isActive);
 				if (isActive) link.setAttribute("aria-current", "page");
 				else link.removeAttribute("aria-current");
@@ -1160,7 +1544,26 @@
 		moduleLinks.forEach((link) => link.addEventListener("click", (event) => {
 			event.preventDefault();
 			showModule(link.dataset.view);
+			if (mobileMenuQuery.matches) {
+				setMenuOpen(false);
+				menuToggle.focus();
+			}
 		}));
+		homeModuleButtons.forEach((button) => button.addEventListener("click", () => {
+			showModule(button.dataset.homeView);
+		}));
+		returnHomeButtons.forEach((button) => button.addEventListener("click", () => {
+			showModule(null);
+			homeModuleButtons[0].focus();
+		}));
+		document.querySelector(".brand").addEventListener("click", (event) => {
+			event.preventDefault();
+			showModule(null);
+			if (mobileMenuQuery.matches) {
+				setMenuOpen(false);
+				menuToggle.focus();
+			}
+		});
 
 		cancelEditButton.addEventListener("click", () => {
 			resetForm();
@@ -1260,6 +1663,66 @@
 			month: "long",
 			year: "numeric"
 		}).format(new Date());
+
+		const welcomeDate = document.querySelector("#welcome-date");
+		const welcomeTime = document.querySelector("#welcome-time");
+		const welcomeDateFormat = new Intl.DateTimeFormat("es", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+		const welcomeTimeFormat = new Intl.DateTimeFormat("es", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+
+		function updateWelcomeClock() {
+			if (welcomeScreen.hidden) return;
+			const now = new Date();
+			welcomeDate.textContent = welcomeDateFormat.format(now);
+			welcomeTime.textContent = welcomeTimeFormat.format(now);
+			welcomeTime.dateTime = now.toISOString();
+		}
+
+		updateWelcomeClock();
+
+		// Cuenta una visita por sesión de pestaña para que recargar no infle el total.
+		function registerVisit() {
+			try {
+				const saved = Number.parseInt(localStorage.getItem(VISITS_STORAGE_KEY) ?? "0", 10);
+				let total = Number.isFinite(saved) && saved > 0 ? saved : 0;
+				if (!sessionStorage.getItem(VISIT_SESSION_KEY)) {
+					total += 1;
+					localStorage.setItem(VISITS_STORAGE_KEY, String(total));
+					sessionStorage.setItem(VISIT_SESSION_KEY, "1");
+				}
+				return total;
+			} catch {
+				return null;
+			}
+		}
+
+		const visitTotal = registerVisit();
+		if (visitTotal !== null) {
+			document.querySelector("#welcome-visits-count").textContent = new Intl.NumberFormat("es").format(visitTotal);
+			document.querySelector("#welcome-visits").hidden = false;
+		}
+		window.setInterval(updateWelcomeClock, 1000);
+
+		const showcase = document.querySelector("#welcome-showcase");
+		const showcaseImages = showcase.querySelectorAll(".welcome-showcase-image");
+		const showcaseDots = showcase.querySelectorAll(".welcome-showcase-dot");
+		let showcaseIndex = 0;
+		let showcasePaused = false;
+
+		function showShowcaseImage(index) {
+			showcaseIndex = index;
+			showcaseImages.forEach((image, position) => image.classList.toggle("active", position === index));
+			showcaseDots.forEach((dot, position) => dot.classList.toggle("active", position === index));
+		}
+
+		showcaseDots.forEach((dot, position) => dot.addEventListener("click", () => showShowcaseImage(position)));
+		showcase.addEventListener("mouseenter", () => { showcasePaused = true; });
+		showcase.addEventListener("mouseleave", () => { showcasePaused = false; });
+		showcase.addEventListener("focusin", () => { showcasePaused = true; });
+		showcase.addEventListener("focusout", () => { showcasePaused = false; });
+		window.setInterval(() => {
+			if (welcomeScreen.hidden || showcasePaused || document.hidden) return;
+			showShowcaseImage((showcaseIndex + 1) % showcaseImages.length);
+		}, 5000);
 
 		renderMachineTypes();
 		renderMachines();
