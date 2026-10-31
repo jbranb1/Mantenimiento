@@ -620,6 +620,17 @@
 		@media (prefers-reduced-motion: reduce) {
 			.sidebar, .main-content, .home-module-button, .welcome-showcase-image { transition: none; }
 		}
+		.session-user { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.logout-button { display: inline-grid; width: 30px; height: 30px; margin-left: auto; place-items: center; border: 0; border-radius: 6px; color: #bbc6d0; background: transparent; }
+		.logout-button:hover, .logout-button:focus-visible { color: #fff; background: rgb(255 255 255 / 12%); }
+		.auth-dialog { width: min(420px, calc(100% - 32px)); padding: 0; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 24px 60px rgb(20 28 36 / 35%); }
+		.auth-dialog::backdrop { background: rgb(20 28 36 / 72%); }
+		.auth-dialog-body { padding: 24px; }
+		.auth-dialog-title { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+		.auth-dialog-copy { margin: 0 0 18px; color: var(--muted); font-size: 12px; }
+		.credentials-box { margin-top: 14px; font-size: 12px; }
+		.credentials-box code { padding: 2px 6px; border-radius: 4px; color: #20262c; background: rgb(255 255 255 / 70%); font-family: "IBM Plex Mono", monospace; font-size: 12px; user-select: all; }
+		.module-badge { display: inline-block; margin: 0 4px 4px 0; padding: 2px 8px; border-radius: 10px; color: #364350; background: #edf0f3; font-size: 10px; font-weight: 600; }
 	</style>
 </head>
 <body>
@@ -685,15 +696,21 @@
 				<a class="module-link" href="#maquinas" data-view="machines">
 					<i class="bi bi-cpu" aria-hidden="true"></i><span>Máquinas</span>
 				</a>
-				<span class="module-link disabled" aria-disabled="true">
-					<i class="bi bi-box-seam" aria-hidden="true"></i><span>Repuestos</span><span class="module-soon">Próximamente</span>
-				</span>
+				<a class="module-link" href="#repuestos" data-view="parts">
+					<i class="bi bi-box-seam" aria-hidden="true"></i><span>Repuestos</span>
+				</a>
+				<a class="module-link d-none" href="#administracion" data-view="admin">
+					<i class="bi bi-person-gear" aria-hidden="true"></i><span>Administración</span>
+				</a>
 				<span class="module-link disabled" aria-disabled="true">
 					<i class="bi bi-wrench-adjustable" aria-hidden="true"></i><span>Mantenimientos</span><span class="module-soon">Próximamente</span>
 				</span>
 			</nav>
 
-			<div class="sidebar-foot"><span class="status-dot" aria-hidden="true"></span>Inventario local activo</div>
+			<div class="sidebar-foot">
+				<span class="status-dot" aria-hidden="true"></span><span class="session-user" id="session-user">Inventario local activo</span>
+				<button class="logout-button" id="logout-button" type="button" aria-label="Cerrar sesión" title="Cerrar sesión"><i class="bi bi-box-arrow-right" aria-hidden="true"></i></button>
+			</div>
 		</aside>
 		<button class="menu-backdrop" id="menu-backdrop" type="button" aria-label="Cerrar menú" tabindex="-1"></button>
 
@@ -721,9 +738,13 @@
 							<span class="home-module-icon"><i class="bi bi-tags" aria-hidden="true"></i></span>
 							<span><span class="home-module-label">Módulo de tipo de máquina</span><span class="home-module-status">Gestionar tipos disponibles</span></span>
 						</button>
-						<button class="home-module-button" type="button" disabled>
+						<button class="home-module-button" type="button" data-home-view="parts">
 							<span class="home-module-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-							<span><span class="home-module-label">Repuestos</span><span class="home-module-status">Próximamente</span></span>
+							<span><span class="home-module-label">Repuestos</span><span class="home-module-status">Controlar existencias de repuestos</span></span>
+						</button>
+						<button class="home-module-button d-none" type="button" data-home-view="admin">
+							<span class="home-module-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span>
+							<span><span class="home-module-label">Administración</span><span class="home-module-status">Usuarios y permisos por módulo</span></span>
 						</button>
 						<button class="home-module-button" type="button" disabled>
 							<span class="home-module-icon"><i class="bi bi-wrench-adjustable" aria-hidden="true"></i></span>
@@ -901,8 +922,239 @@
 					</section>
 				</div>
 			</div>
+
+			<div class="workspace module-view d-none" id="parts-view">
+				<section class="page-heading" aria-labelledby="parts-page-title">
+					<div>
+						<div class="eyebrow">Control de existencias</div>
+						<h1 id="parts-page-title">Repuestos</h1>
+						<p class="page-subtitle">Consulta y administra los repuestos disponibles en tu planta.</p>
+						<button class="btn btn-secondary-action module-home-button" type="button" data-return-home>
+							<i class="bi bi-house-door" aria-hidden="true"></i><span>Volver al inicio</span>
+						</button>
+					</div>
+					<div class="inventory-summary" aria-live="polite">
+						<span class="summary-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+						<span><span class="summary-number" id="part-total">0</span><span class="summary-label">repuestos registrados</span></span>
+					</div>
+				</section>
+
+				<div class="content-grid">
+					<section class="surface" aria-labelledby="part-form-title">
+						<div class="surface-heading">
+							<span class="surface-heading-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
+							<div>
+								<h2 class="surface-title" id="part-form-title">Registrar repuesto</h2>
+								<p class="surface-description">Completa los datos del repuesto.</p>
+							</div>
+						</div>
+
+						<form id="part-form" class="form-body">
+							<input id="part-id" type="hidden">
+							<div class="field-block">
+								<label class="form-label" for="part-code">Código de repuesto <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control code-input" id="part-code" name="code" type="text" maxlength="30" placeholder="Ej. REP-001" autocomplete="off" required>
+								<div class="field-help">Debe ser único para cada repuesto.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-brand">Marca <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="part-brand" name="brand" type="text" maxlength="60" placeholder="Ej. SKF" autocomplete="organization" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-model">Modelo <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="part-model" name="model" type="text" maxlength="60" placeholder="Ej. 6205-2RS" autocomplete="off" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-numbering">Numeración <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="part-numbering" name="numbering" type="text" maxlength="60" placeholder="Ej. 25 mm, N.º 12" autocomplete="off" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-material">Tipo de material <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="part-material" name="material" type="text" maxlength="60" placeholder="Ej. Acero inoxidable" autocomplete="off" required>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-stock">Existencia <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="part-stock" name="stock" type="number" min="0" max="999999" step="1" inputmode="numeric" placeholder="Ej. 10" required>
+								<div class="field-help">Cantidad de unidades disponibles.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="part-photo">Fotografía del repuesto</label>
+								<input class="form-control" id="part-photo" name="photo" type="file" accept="image/*" aria-describedby="part-photo-help">
+								<div class="field-help" id="part-photo-help">Opcional. La imagen se optimiza para almacenarse en este navegador.</div>
+								<div class="photo-preview d-none" id="part-photo-preview">
+									<img id="part-photo-preview-image" alt="Vista previa de la fotografía seleccionada">
+									<button class="btn btn-secondary-action photo-clear-button" id="clear-part-photo" type="button">Quitar fotografía</button>
+								</div>
+							</div>
+							<div class="form-actions">
+								<button class="btn btn-primary-action" id="part-submit-button" type="submit"><i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar repuesto</span></button>
+								<button class="btn btn-secondary-action d-none" id="part-cancel-edit" type="button">Cancelar</button>
+							</div>
+						</form>
+						<div class="alert alert-success notice d-none" id="part-notice" role="status" aria-live="polite"></div>
+					</section>
+
+					<section class="surface" aria-labelledby="part-list-title">
+						<div class="list-top">
+							<div>
+								<h2 class="surface-title" id="part-list-title">Inventario de repuestos <span class="list-count" id="visible-part-count">0</span></h2>
+								<p class="surface-description">Todos los repuestos registrados en este navegador.</p>
+							</div>
+							<div class="list-tools">
+								<button class="btn btn-primary-action export-button" id="export-parts" type="button" disabled>
+									<i class="bi bi-file-earmark-excel" aria-hidden="true"></i><span>Exportar a Excel</span>
+								</button>
+								<label class="search-wrap">
+									<i class="bi bi-search" aria-hidden="true"></i>
+									<span class="visually-hidden">Buscar repuestos</span>
+									<input class="form-control search-input" id="part-search" type="search" placeholder="Buscar por código, marca o modelo">
+								</label>
+							</div>
+						</div>
+						<div class="table-wrap">
+							<table class="table machine-table align-middle">
+								<thead>
+									<tr>
+										<th scope="col">Foto</th>
+										<th scope="col">Código</th>
+										<th scope="col">Marca</th>
+										<th scope="col">Modelo</th>
+										<th scope="col">Numeración</th>
+										<th scope="col">Tipo de material</th>
+										<th scope="col">Existencia</th>
+										<th scope="col"><span class="visually-hidden">Acciones</span></th>
+									</tr>
+								</thead>
+								<tbody id="part-list"></tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</div>
+			<div class="workspace module-view d-none" id="admin-view">
+				<section class="page-heading" aria-labelledby="admin-page-title">
+					<div>
+						<div class="eyebrow">Seguridad y accesos</div>
+						<h1 id="admin-page-title">Administración</h1>
+						<p class="page-subtitle">Crea usuarios y define a qué módulos pueden entrar.</p>
+						<button class="btn btn-secondary-action module-home-button" type="button" data-return-home>
+							<i class="bi bi-house-door" aria-hidden="true"></i><span>Volver al inicio</span>
+						</button>
+					</div>
+					<div class="inventory-summary" aria-live="polite">
+						<span class="summary-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+						<span><span class="summary-number" id="user-total">0</span><span class="summary-label">usuarios registrados</span></span>
+					</div>
+				</section>
+
+				<div class="content-grid">
+					<section class="surface" aria-labelledby="user-form-title">
+						<div class="surface-heading">
+							<span class="surface-heading-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+							<div>
+								<h2 class="surface-title" id="user-form-title">Crear usuario</h2>
+								<p class="surface-description">Se genera una contraseña temporal que el usuario deberá cambiar al ingresar.</p>
+							</div>
+						</div>
+						<form id="user-form" class="form-body" autocomplete="off">
+							<input id="user-id" type="hidden">
+							<div class="field-block">
+								<label class="form-label" for="user-username">Nombre de usuario <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="user-username" type="text" minlength="3" maxlength="30" pattern="[A-Za-z0-9._\-]+" placeholder="Ej. jperez" autocomplete="off" required>
+								<div class="field-help">Entre 3 y 30 caracteres: letras, números, punto, guion o guion bajo.</div>
+							</div>
+							<div class="field-block">
+								<label class="form-label" for="user-fullname">Nombre completo <span class="required-mark" aria-hidden="true">*</span></label>
+								<input class="form-control" id="user-fullname" type="text" maxlength="80" placeholder="Ej. Juan Pérez" autocomplete="off" required>
+							</div>
+							<fieldset class="field-block">
+								<legend class="form-label">Módulos permitidos <span class="required-mark" aria-hidden="true">*</span></legend>
+								<div id="user-modules"></div>
+								<div class="field-help">Selecciona al menos un módulo.</div>
+							</fieldset>
+							<div class="form-actions">
+								<button class="btn btn-primary-action" id="user-submit-button" type="submit"><i class="bi bi-plus-circle" aria-hidden="true"></i><span>Crear usuario</span></button>
+								<button class="btn btn-secondary-action d-none" id="user-cancel-edit" type="button">Cancelar</button>
+							</div>
+						</form>
+						<div class="alert alert-success notice d-none" id="user-notice" role="status" aria-live="polite"></div>
+						<div class="alert alert-warning credentials-box d-none" id="user-credentials" role="status">
+							<div>Entrega estos datos al usuario. <strong>La contraseña no se volverá a mostrar.</strong></div>
+							<div class="mt-2">Usuario: <code id="credentials-username"></code></div>
+							<div class="mt-1">Contraseña temporal: <code id="credentials-password"></code></div>
+							<button class="btn btn-secondary-action mt-2" id="copy-credentials" type="button"><i class="bi bi-clipboard" aria-hidden="true"></i><span>Copiar datos</span></button>
+						</div>
+					</section>
+
+					<section class="surface" aria-labelledby="user-list-title">
+						<div class="list-top">
+							<div>
+								<h2 class="surface-title" id="user-list-title">Usuarios <span class="list-count" id="visible-user-count">0</span></h2>
+								<p class="surface-description">Cuentas con acceso al sistema en este navegador.</p>
+							</div>
+							<label class="search-wrap">
+								<i class="bi bi-search" aria-hidden="true"></i>
+								<span class="visually-hidden">Buscar usuarios</span>
+								<input class="form-control search-input" id="user-search" type="search" placeholder="Buscar usuario o nombre">
+							</label>
+						</div>
+						<div class="table-wrap">
+							<table class="table machine-table align-middle">
+								<thead>
+									<tr>
+										<th scope="col">Usuario</th>
+										<th scope="col">Nombre</th>
+										<th scope="col">Módulos</th>
+										<th scope="col">Estado</th>
+										<th scope="col"><span class="visually-hidden">Acciones</span></th>
+									</tr>
+								</thead>
+								<tbody id="user-list"></tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</div>
 		</main>
 	</div>
+	<dialog class="auth-dialog" id="login-dialog" aria-labelledby="login-title">
+		<form class="auth-dialog-body" id="login-form" autocomplete="off">
+			<h2 class="auth-dialog-title" id="login-title">Iniciar sesión</h2>
+			<p class="auth-dialog-copy">Ingresa con tu usuario y contraseña.</p>
+			<div class="field-block">
+				<label class="form-label" for="login-username">Usuario</label>
+				<input class="form-control" id="login-username" type="text" maxlength="30" autocomplete="username" required>
+			</div>
+			<div class="field-block">
+				<label class="form-label" for="login-password">Contraseña</label>
+				<input class="form-control" id="login-password" type="password" maxlength="128" autocomplete="current-password" required>
+			</div>
+			<div class="alert alert-danger notice d-none" id="login-error" role="alert"></div>
+			<div class="form-actions">
+				<button class="btn btn-primary-action" id="login-submit" type="submit"><span>Ingresar</span></button>
+				<button class="btn btn-secondary-action" id="login-cancel" type="button">Cancelar</button>
+			</div>
+		</form>
+	</dialog>
+	<dialog class="auth-dialog" id="password-dialog" aria-labelledby="password-title">
+		<form class="auth-dialog-body" id="password-form" autocomplete="off">
+			<h2 class="auth-dialog-title" id="password-title">Cambia tu contraseña</h2>
+			<p class="auth-dialog-copy">Es tu primer ingreso (o tu contraseña fue restablecida). Debes definir una contraseña nueva para continuar.</p>
+			<div class="field-block">
+				<label class="form-label" for="new-password">Contraseña nueva</label>
+				<input class="form-control" id="new-password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+				<div class="field-help">Mínimo 8 caracteres, con al menos una letra y un número.</div>
+			</div>
+			<div class="field-block">
+				<label class="form-label" for="confirm-password">Confirma la contraseña</label>
+				<input class="form-control" id="confirm-password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+			</div>
+			<div class="alert alert-danger notice d-none" id="password-error" role="alert"></div>
+			<div class="form-actions">
+				<button class="btn btn-primary-action" id="password-submit" type="submit"><span>Guardar contraseña</span></button>
+			</div>
+		</form>
+	</dialog>
 	<dialog class="photo-dialog" id="photo-dialog" aria-labelledby="photo-dialog-title">
 		<div class="photo-dialog-header">
 			<h2 class="photo-dialog-title" id="photo-dialog-title">Fotografía de máquina</h2>
@@ -915,6 +1167,7 @@
 	<script>
 		const STORAGE_KEY = "control-industrial-maquinas-v1";
 		const TYPE_STORAGE_KEY = "control-industrial-tipos-maquina-v1";
+		const PART_STORAGE_KEY = "control-industrial-repuestos-v1";
 		const VISITS_STORAGE_KEY = "control-industrial-visitas-v1";
 		const VISIT_SESSION_KEY = "control-industrial-visita-registrada";
 		const machineForm = document.querySelector("#machine-form");
@@ -956,6 +1209,9 @@
 		const homeView = document.querySelector("#home-view");
 		const machinesView = document.querySelector("#machines-view");
 		const typesView = document.querySelector("#types-view");
+		const partsView = document.querySelector("#parts-view");
+		const adminView = document.querySelector("#admin-view");
+		let currentUser = null;
 		const currentModule = document.querySelector("#current-module");
 		const breadcrumbSeparator = document.querySelector("#breadcrumb-separator");
 		const moduleLinks = document.querySelectorAll(".module-link[data-view]");
@@ -973,10 +1229,7 @@
 		let photoProcessing = false;
 
 		enterSystemButton.addEventListener("click", () => {
-			welcomeScreen.hidden = true;
-			appShell.hidden = false;
-			showModule(null);
-			menuToggle.focus();
+			openLogin();
 		});
 
 		function setMenuOpen(isOpen) {
@@ -1142,18 +1395,25 @@
 		}
 
 		function showModule(view) {
+			if (view && !canAccess(view)) view = null;
 			const showTypes = view === "types";
 			const showMachines = view === "machines";
-			const hasActiveModule = showTypes || showMachines;
+			const showParts = view === "parts";
+			const showAdmin = view === "admin";
+			const hasActiveModule = showTypes || showMachines || showParts || showAdmin;
 			homeView.hidden = hasActiveModule;
 			machinesView.classList.toggle("d-none", !showMachines);
 			typesView.classList.toggle("d-none", !showTypes);
-			currentModule.textContent = showTypes ? "Módulo de tipo de máquina" : showMachines ? "Máquinas" : "";
+			partsView.classList.toggle("d-none", !showParts);
+			adminView.classList.toggle("d-none", !showAdmin);
+			currentModule.textContent = showTypes ? "Módulo de tipo de máquina" : showMachines ? "Máquinas" : showParts ? "Repuestos" : showAdmin ? "Administración" : "";
 			currentModule.hidden = !hasActiveModule;
 			breadcrumbSeparator.hidden = !hasActiveModule;
 			document.title = showTypes
 				? "Control Industrial | Tipos de máquina"
-				: showMachines ? "Control Industrial | Máquinas" : "Control Industrial | Inicio";
+				: showMachines ? "Control Industrial | Máquinas"
+				: showParts ? "Control Industrial | Repuestos"
+				: showAdmin ? "Control Industrial | Administración" : "Control Industrial | Inicio";
 			for (const link of moduleLinks) {
 				const isActive = hasActiveModule && link.dataset.view === view;
 				link.classList.toggle("active", isActive);
@@ -1553,8 +1813,9 @@
 			showModule(button.dataset.homeView);
 		}));
 		returnHomeButtons.forEach((button) => button.addEventListener("click", () => {
+			let focused = false;
 			showModule(null);
-			homeModuleButtons[0].focus();
+			homeModuleButtons.forEach((button) => { if (!button.classList.contains("d-none") && !button.disabled && !focused) { button.focus(); focused = true; } });
 		}));
 		document.querySelector(".brand").addEventListener("click", (event) => {
 			event.preventDefault();
@@ -1580,6 +1841,7 @@
 			if (button.dataset.action === "view-photo") {
 				if (!machine.photoData) return;
 				photoDialogTitle.textContent = `Fotografía: ${machine.code}`;
+				enlargedPhoto.alt = "Fotografía ampliada de la máquina";
 				enlargedPhoto.src = machine.photoData;
 				photoDialog.showModal();
 				return;
@@ -1726,6 +1988,843 @@
 
 		renderMachineTypes();
 		renderMachines();
+
+		const partForm = document.querySelector("#part-form");
+		const partList = document.querySelector("#part-list");
+		const partIdInput = document.querySelector("#part-id");
+		const partCodeInput = document.querySelector("#part-code");
+		const partBrandInput = document.querySelector("#part-brand");
+		const partModelInput = document.querySelector("#part-model");
+		const partNumberingInput = document.querySelector("#part-numbering");
+		const partMaterialInput = document.querySelector("#part-material");
+		const partStockInput = document.querySelector("#part-stock");
+		const partPhotoInput = document.querySelector("#part-photo");
+		const partPhotoPreview = document.querySelector("#part-photo-preview");
+		const partPhotoPreviewImage = document.querySelector("#part-photo-preview-image");
+		const clearPartPhotoButton = document.querySelector("#clear-part-photo");
+		const partSearch = document.querySelector("#part-search");
+		const exportPartsButton = document.querySelector("#export-parts");
+		const partTotal = document.querySelector("#part-total");
+		const visiblePartCount = document.querySelector("#visible-part-count");
+		const partFormTitle = document.querySelector("#part-form-title");
+		const partSubmitButton = document.querySelector("#part-submit-button");
+		const partCancelEditButton = document.querySelector("#part-cancel-edit");
+		const partNotice = document.querySelector("#part-notice");
+
+		let parts = loadParts();
+		let currentPartPhotoData = "";
+		let partPhotoProcessing = false;
+
+		function loadParts() {
+			try {
+				const savedParts = JSON.parse(localStorage.getItem(PART_STORAGE_KEY) || "[]");
+				return Array.isArray(savedParts) ? savedParts : [];
+			} catch {
+				return [];
+			}
+		}
+
+		function saveParts() {
+			try {
+				localStorage.setItem(PART_STORAGE_KEY, JSON.stringify(parts));
+				return true;
+			} catch {
+				showPartNotice("No fue posible guardar los datos en este navegador.", "danger");
+				return false;
+			}
+		}
+
+		function showPartNotice(message, type = "success") {
+			partNotice.textContent = message;
+			partNotice.className = `alert alert-${type} notice`;
+		}
+
+		function hidePartNotice() {
+			partNotice.classList.add("d-none");
+		}
+
+		function showPartPhotoPreview(photoData) {
+			partPhotoPreviewImage.src = photoData;
+			partPhotoPreview.classList.toggle("d-none", !photoData);
+		}
+
+		function resetPartForm() {
+			partForm.reset();
+			partIdInput.value = "";
+			currentPartPhotoData = "";
+			showPartPhotoPreview("");
+			partCodeInput.setCustomValidity("");
+			partFormTitle.textContent = "Registrar repuesto";
+			partSubmitButton.innerHTML = '<i class="bi bi-plus-circle" aria-hidden="true"></i><span>Guardar repuesto</span>';
+			partCancelEditButton.classList.add("d-none");
+		}
+
+		function renderParts() {
+			const query = partSearch.value.trim().toLocaleLowerCase("es");
+			const filteredParts = parts.filter((part) =>
+				[part.code, part.brand, part.model, part.numbering, part.material, part.stock]
+					.some((value) => String(value ?? "").toLocaleLowerCase("es").includes(query))
+			);
+
+			partList.replaceChildren();
+			partTotal.textContent = String(parts.length);
+			visiblePartCount.textContent = String(filteredParts.length);
+			exportPartsButton.disabled = parts.length === 0;
+
+			if (filteredParts.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.colSpan = 8;
+				cell.className = "empty-cell";
+
+				const icon = document.createElement("i");
+				icon.className = `bi ${parts.length === 0 ? "bi-inboxes" : "bi-search"} empty-icon`;
+				icon.setAttribute("aria-hidden", "true");
+
+				const title = document.createElement("span");
+				title.className = "empty-title";
+				title.textContent = parts.length === 0 ? "Aún no hay repuestos registrados" : "No se encontraron coincidencias";
+
+				const description = document.createElement("span");
+				description.className = "empty-copy";
+				description.textContent = parts.length === 0
+					? "Completa el formulario para agregar el primer repuesto."
+					: "Prueba con otro código, marca o modelo.";
+
+				cell.append(icon, title, description);
+				row.append(cell);
+				partList.append(row);
+				return;
+			}
+
+			for (const part of filteredParts) {
+				const row = document.createElement("tr");
+				const photoCell = document.createElement("td");
+				const photoButton = createPhotoButton(part);
+				photoButton.dataset.action = "view-part-photo";
+				photoCell.append(photoButton);
+				row.append(photoCell);
+				const values = [
+					{ value: part.code, className: "machine-code" },
+					{ value: part.brand, className: "machine-brand" },
+					{ value: part.model, className: "machine-type" },
+					{ value: part.numbering, className: "machine-type" },
+					{ value: part.material, className: "machine-type" },
+					{ value: part.stock, className: "machine-brand" }
+				];
+
+				for (const item of values) {
+					const cell = document.createElement("td");
+					const text = document.createElement("span");
+					text.className = item.className;
+					text.textContent = item.value;
+					cell.append(text);
+					row.append(cell);
+				}
+
+				const actionCell = document.createElement("td");
+				const actions = document.createElement("div");
+				actions.className = "row-actions";
+				actions.append(
+					createActionButton("bi-pencil-square", "Editar", "edit-part", part.id),
+					createActionButton("bi-trash3", "Eliminar", "delete-part", part.id)
+				);
+				actionCell.append(actions);
+				row.append(actionCell);
+				partList.append(row);
+			}
+		}
+
+		async function exportPartsToExcel() {
+			if (parts.length === 0) return;
+			if (!globalThis.ExcelJS) {
+				showPartNotice("No se pudo cargar la librería de Excel. Revisa tu conexión a internet e inténtalo de nuevo.", "danger");
+				return;
+			}
+
+			exportPartsButton.disabled = true;
+			exportPartsButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>Preparando Excel...</span>';
+			try {
+				const workbook = new ExcelJS.Workbook();
+				workbook.creator = "Control Industrial";
+				workbook.created = new Date();
+				const worksheet = workbook.addWorksheet("Repuestos", { views: [{ state: "frozen", ySplit: 1 }] });
+				worksheet.columns = [
+					{ header: "Fotografía", key: "photo", width: 18 },
+					{ header: "Código", key: "code", width: 18 },
+					{ header: "Marca", key: "brand", width: 22 },
+					{ header: "Modelo", key: "model", width: 22 },
+					{ header: "Numeración", key: "numbering", width: 20 },
+					{ header: "Tipo de material", key: "material", width: 24 },
+					{ header: "Existencia", key: "stock", width: 14 }
+				];
+
+				const header = worksheet.getRow(1);
+				header.height = 26;
+				header.eachCell((cell) => {
+					cell.font = { bold: true, color: { argb: "FFFFFFFF" }, name: "Arial", size: 11 };
+					cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF20372D" } };
+					cell.alignment = { vertical: "middle", horizontal: "left" };
+				});
+
+				parts.forEach((part, index) => {
+					const rowNumber = index + 2;
+					const row = worksheet.addRow({
+						photo: part.photoData ? "" : "Sin fotografía",
+						code: part.code,
+						brand: part.brand,
+						model: part.model,
+						numbering: part.numbering,
+						material: part.material,
+						stock: part.stock
+					});
+					row.height = part.photoData ? 58 : 24;
+					row.alignment = { vertical: "middle", wrapText: true };
+					row.eachCell((cell) => {
+						cell.border = { bottom: { style: "thin", color: { argb: "FFE3E8E2" } } };
+					});
+
+					if (part.photoData) {
+						const imageId = workbook.addImage({ base64: part.photoData, extension: "jpeg" });
+						worksheet.addImage(imageId, {
+							tl: { col: 0, row: rowNumber - 1 },
+							ext: { width: 90, height: 72 },
+							editAs: "oneCell"
+						});
+					}
+				});
+
+				worksheet.autoFilter = { from: "A1", to: "G1" };
+				const fileBuffer = await workbook.xlsx.writeBuffer();
+				const fileBlob = new Blob([fileBuffer], {
+					type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+				});
+				const downloadUrl = URL.createObjectURL(fileBlob);
+				const downloadLink = document.createElement("a");
+				downloadLink.href = downloadUrl;
+				downloadLink.download = `inventario-repuestos-${new Date().toISOString().slice(0, 10)}.xlsx`;
+				downloadLink.click();
+				window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+				showPartNotice(`Se exportaron ${parts.length} repuestos a Excel con sus fotografías.`, "success");
+			} catch (error) {
+				showPartNotice(`No fue posible generar el archivo Excel: ${error.message}`, "danger");
+			} finally {
+				exportPartsButton.innerHTML = '<i class="bi bi-file-earmark-excel" aria-hidden="true"></i><span>Exportar a Excel</span>';
+				exportPartsButton.disabled = parts.length === 0;
+			}
+		}
+
+		partForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			hidePartNotice();
+			partCodeInput.setCustomValidity("");
+			if (partPhotoProcessing) {
+				showPartNotice("Espera a que termine la optimización de la fotografía.", "warning");
+				return;
+			}
+
+			if (!partForm.reportValidity()) return;
+
+			const editingId = partIdInput.value;
+			const code = partCodeInput.value.trim().toLocaleUpperCase("es");
+			const duplicate = parts.some((part) =>
+				part.code.toLocaleLowerCase("es") === code.toLocaleLowerCase("es") && part.id !== editingId
+			);
+
+			if (duplicate) {
+				partCodeInput.setCustomValidity("Ya existe un repuesto con este código.");
+				partCodeInput.reportValidity();
+				return;
+			}
+
+			const part = {
+				id: editingId || globalThis.crypto?.randomUUID?.() || String(Date.now()),
+				code,
+				brand: partBrandInput.value.trim(),
+				model: partModelInput.value.trim(),
+				numbering: partNumberingInput.value.trim(),
+				material: partMaterialInput.value.trim(),
+				stock: Number.parseInt(partStockInput.value, 10),
+				photoData: currentPartPhotoData
+			};
+
+			const previousParts = parts;
+			parts = editingId
+				? parts.map((item) => item.id === editingId ? part : item)
+				: [part, ...parts];
+
+			if (!saveParts()) {
+				parts = previousParts;
+				return;
+			}
+
+			resetPartForm();
+			renderParts();
+			showPartNotice(editingId ? "Los cambios se guardaron correctamente." : "El repuesto se registró correctamente.");
+		});
+
+		partCodeInput.addEventListener("input", () => partCodeInput.setCustomValidity(""));
+		partPhotoInput.addEventListener("change", async () => {
+			const [file] = partPhotoInput.files;
+			if (!file) return;
+			if (!file.type.startsWith("image/")) {
+				showPartNotice("Selecciona un archivo de imagen.", "warning");
+				partPhotoInput.value = "";
+				return;
+			}
+			if (file.size > 15 * 1024 * 1024) {
+				showPartNotice("La fotografía no puede superar los 15 MB.", "warning");
+				partPhotoInput.value = "";
+				return;
+			}
+
+			partPhotoProcessing = true;
+			partSubmitButton.disabled = true;
+			try {
+				currentPartPhotoData = await compressPhoto(file);
+				showPartPhotoPreview(currentPartPhotoData);
+				hidePartNotice();
+			} catch (error) {
+				showPartNotice(error.message, "danger");
+				partPhotoInput.value = "";
+			} finally {
+				partPhotoProcessing = false;
+				partSubmitButton.disabled = false;
+			}
+		});
+		clearPartPhotoButton.addEventListener("click", () => {
+			currentPartPhotoData = "";
+			partPhotoInput.value = "";
+			showPartPhotoPreview("");
+		});
+		partSearch.addEventListener("input", renderParts);
+		exportPartsButton.addEventListener("click", exportPartsToExcel);
+		partCancelEditButton.addEventListener("click", () => {
+			resetPartForm();
+			hidePartNotice();
+		});
+
+		partList.addEventListener("click", (event) => {
+			const button = event.target.closest("button[data-action]");
+			if (!button) return;
+
+			const part = parts.find((item) => item.id === button.dataset.id);
+			if (!part) return;
+
+			if (button.dataset.action === "view-part-photo") {
+				if (!part.photoData) return;
+				photoDialogTitle.textContent = `Fotografía: ${part.code}`;
+				enlargedPhoto.alt = "Fotografía ampliada del repuesto";
+				enlargedPhoto.src = part.photoData;
+				photoDialog.showModal();
+				return;
+			}
+
+			if (button.dataset.action === "edit-part") {
+				partIdInput.value = part.id;
+				partCodeInput.value = part.code;
+				partBrandInput.value = part.brand;
+				partModelInput.value = part.model;
+				partNumberingInput.value = part.numbering;
+				partMaterialInput.value = part.material;
+				partStockInput.value = part.stock;
+				currentPartPhotoData = part.photoData || "";
+				partPhotoInput.value = "";
+				showPartPhotoPreview(currentPartPhotoData);
+				partFormTitle.textContent = "Editar repuesto";
+				partSubmitButton.innerHTML = '<i class="bi bi-check2-circle" aria-hidden="true"></i><span>Guardar cambios</span>';
+				partCancelEditButton.classList.remove("d-none");
+				hidePartNotice();
+				partCodeInput.focus();
+				return;
+			}
+
+			if (button.dataset.action === "delete-part" && window.confirm(`¿Eliminar el repuesto ${part.code}?`)) {
+				const previousParts = parts;
+				parts = parts.filter((item) => item.id !== part.id);
+				if (saveParts()) {
+					renderParts();
+					showPartNotice("El repuesto se eliminó del inventario.");
+					if (partIdInput.value === part.id) resetPartForm();
+				} else {
+					parts = previousParts;
+				}
+			}
+		});
+
+		renderParts();
+
+		const USERS_STORAGE_KEY = "control-industrial-usuarios-v1";
+		const ADMIN_USERNAME = "admin";
+		const ADMIN_INITIAL_PASSWORD = "Admin2026!";
+		const ASSIGNABLE_MODULES = [
+			{ id: "machines", label: "Máquinas" },
+			{ id: "types", label: "Tipos de máquina" },
+			{ id: "parts", label: "Repuestos" }
+		];
+		const loginDialog = document.querySelector("#login-dialog");
+		const loginForm = document.querySelector("#login-form");
+		const loginUsernameInput = document.querySelector("#login-username");
+		const loginPasswordInput = document.querySelector("#login-password");
+		const loginError = document.querySelector("#login-error");
+		const loginSubmit = document.querySelector("#login-submit");
+		const passwordDialog = document.querySelector("#password-dialog");
+		const passwordForm = document.querySelector("#password-form");
+		const newPasswordInput = document.querySelector("#new-password");
+		const confirmPasswordInput = document.querySelector("#confirm-password");
+		const passwordError = document.querySelector("#password-error");
+		const passwordSubmit = document.querySelector("#password-submit");
+		const sessionUser = document.querySelector("#session-user");
+		const userForm = document.querySelector("#user-form");
+		const userIdInput = document.querySelector("#user-id");
+		const userUsernameInput = document.querySelector("#user-username");
+		const userFullnameInput = document.querySelector("#user-fullname");
+		const userModulesBox = document.querySelector("#user-modules");
+		const userFormTitle = document.querySelector("#user-form-title");
+		const userSubmitButton = document.querySelector("#user-submit-button");
+		const userCancelEditButton = document.querySelector("#user-cancel-edit");
+		const userNotice = document.querySelector("#user-notice");
+		const userCredentials = document.querySelector("#user-credentials");
+		const userList = document.querySelector("#user-list");
+		const userSearch = document.querySelector("#user-search");
+		const userTotal = document.querySelector("#user-total");
+		const visibleUserCount = document.querySelector("#visible-user-count");
+
+		let users = loadUsers();
+		let pendingUser = null;
+
+		function loadUsers() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]");
+				return Array.isArray(saved)
+					? saved.filter((user) => user && typeof user.username === "string" && user.salt && user.hash)
+					: [];
+			} catch {
+				return [];
+			}
+		}
+
+		function saveUsers() {
+			try {
+				localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+				return true;
+			} catch {
+				showUserNotice("No fue posible guardar los usuarios en este navegador.", "danger");
+				return false;
+			}
+		}
+
+		function randomBytes(length) {
+			return crypto.getRandomValues(new Uint8Array(length));
+		}
+
+		function bytesToHex(bytes) {
+			return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+		}
+
+		async function hashPassword(password, saltHex) {
+			const subtle = globalThis.crypto?.subtle;
+			if (!subtle) throw new Error("Este navegador no permite proteger contraseñas (requiere HTTPS o localhost).");
+			const salt = Uint8Array.from(saltHex.match(/../g), (pair) => Number.parseInt(pair, 16));
+			const key = await subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+			const bits = await subtle.deriveBits({ name: "PBKDF2", salt, iterations: 150000, hash: "SHA-256" }, key, 256);
+			return bytesToHex(new Uint8Array(bits));
+		}
+
+		async function createCredentials(password) {
+			const salt = bytesToHex(randomBytes(16));
+			return { salt, hash: await hashPassword(password, salt) };
+		}
+
+		function generateTemporaryPassword() {
+			const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+			const limit = 256 - (256 % alphabet.length);
+			let password = "";
+			while (password.length < 10) {
+				for (const byte of randomBytes(16)) {
+					if (byte < limit && password.length < 10) password += alphabet[byte % alphabet.length];
+				}
+			}
+			// Garantiza letras y números para cumplir la misma regla que exige el cambio de contraseña.
+			return /\d/.test(password) && /[A-Za-z]/.test(password) ? password : generateTemporaryPassword();
+		}
+
+		async function ensureAdminUser() {
+			if (users.some((user) => user.role === "admin")) return;
+			const credentials = await createCredentials(ADMIN_INITIAL_PASSWORD);
+			users = [
+				{ id: "admin-default", username: ADMIN_USERNAME, fullName: "Administrador", role: "admin", modules: [], mustChange: true, ...credentials },
+				...users.filter((user) => user.username !== ADMIN_USERNAME)
+			];
+			try {
+				localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+			} catch {
+				// Sin almacenamiento, el administrador inicial se recrea en cada carga.
+			}
+		}
+
+		const usersReady = ensureAdminUser().catch(() => {});
+
+		function canAccess(view) {
+			if (!currentUser) return false;
+			if (view === "admin") return currentUser.role === "admin";
+			return currentUser.role === "admin" || (Array.isArray(currentUser.modules) && currentUser.modules.includes(view));
+		}
+
+		function applyPermissions() {
+			moduleLinks.forEach((link) => link.classList.toggle("d-none", !canAccess(link.dataset.view)));
+			homeModuleButtons.forEach((button) => button.classList.toggle("d-none", !canAccess(button.dataset.homeView)));
+			sessionUser.textContent = currentUser ? `${currentUser.fullName || currentUser.username} (${currentUser.username})` : "Inventario local activo";
+		}
+
+		function openLogin() {
+			loginForm.reset();
+			loginError.classList.add("d-none");
+			loginDialog.showModal();
+			loginUsernameInput.focus();
+		}
+
+		function startSession(user) {
+			currentUser = user;
+			loginDialog.close();
+			passwordDialog.close();
+			welcomeScreen.hidden = true;
+			appShell.hidden = false;
+			applyPermissions();
+			renderUsers();
+			showModule(null);
+			menuToggle.focus();
+		}
+
+		function openPasswordChange(user) {
+			pendingUser = user;
+			passwordForm.reset();
+			passwordError.classList.add("d-none");
+			loginDialog.close();
+			passwordDialog.showModal();
+			newPasswordInput.focus();
+		}
+
+		loginDialog.addEventListener("cancel", () => loginDialog.close());
+		passwordDialog.addEventListener("cancel", (event) => event.preventDefault());
+		document.querySelector("#login-cancel").addEventListener("click", () => loginDialog.close());
+
+		loginForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			loginError.classList.add("d-none");
+			loginSubmit.disabled = true;
+			try {
+				await usersReady;
+				const username = loginUsernameInput.value.trim().toLocaleLowerCase("es");
+				const user = users.find((item) => item.username === username);
+				const hash = user ? await hashPassword(loginPasswordInput.value, user.salt) : null;
+				if (!user || hash !== user.hash) {
+					loginError.textContent = "Usuario o contraseña incorrectos.";
+					loginError.classList.remove("d-none");
+					loginPasswordInput.value = "";
+					loginPasswordInput.focus();
+					return;
+				}
+				if (user.mustChange) openPasswordChange(user);
+				else startSession(user);
+			} catch (error) {
+				loginError.textContent = error.message;
+				loginError.classList.remove("d-none");
+			} finally {
+				loginSubmit.disabled = false;
+			}
+		});
+
+		passwordForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			passwordError.classList.add("d-none");
+			const password = newPasswordInput.value;
+			let message = "";
+			if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+				message = "La contraseña debe tener al menos 8 caracteres, con una letra y un número.";
+			} else if (password !== confirmPasswordInput.value) {
+				message = "Las contraseñas no coinciden.";
+			}
+			passwordSubmit.disabled = true;
+			try {
+				if (!message && await hashPassword(password, pendingUser.salt) === pendingUser.hash) {
+					message = "La contraseña nueva debe ser distinta de la temporal.";
+				}
+				if (message) {
+					passwordError.textContent = message;
+					passwordError.classList.remove("d-none");
+					return;
+				}
+				const credentials = await createCredentials(password);
+				const updatedUser = { ...pendingUser, ...credentials, mustChange: false };
+				const previousUsers = users;
+				users = users.map((item) => item.id === pendingUser.id ? updatedUser : item);
+				try {
+					localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+				} catch {
+					users = previousUsers;
+					passwordError.textContent = "No fue posible guardar la contraseña en este navegador.";
+					passwordError.classList.remove("d-none");
+					return;
+				}
+				pendingUser = null;
+				startSession(updatedUser);
+			} catch (error) {
+				passwordError.textContent = error.message;
+				passwordError.classList.remove("d-none");
+			} finally {
+				passwordSubmit.disabled = false;
+			}
+		});
+
+		document.querySelector("#logout-button").addEventListener("click", () => window.location.reload());
+
+		function showUserNotice(message, type = "success") {
+			userNotice.textContent = message;
+			userNotice.className = `alert alert-${type} notice`;
+		}
+
+		function hideUserFeedback() {
+			userNotice.classList.add("d-none");
+			userCredentials.classList.add("d-none");
+		}
+
+		function showCredentials(username, password) {
+			document.querySelector("#credentials-username").textContent = username;
+			document.querySelector("#credentials-password").textContent = password;
+			userCredentials.classList.remove("d-none");
+		}
+
+		function renderModuleCheckboxes(selected = []) {
+			userModulesBox.replaceChildren();
+			for (const module of ASSIGNABLE_MODULES) {
+				const wrapper = document.createElement("div");
+				wrapper.className = "form-check";
+				const input = document.createElement("input");
+				input.className = "form-check-input";
+				input.type = "checkbox";
+				input.id = `user-module-${module.id}`;
+				input.value = module.id;
+				input.checked = selected.includes(module.id);
+				const label = document.createElement("label");
+				label.className = "form-check-label";
+				label.htmlFor = input.id;
+				label.textContent = module.label;
+				wrapper.append(input, label);
+				userModulesBox.append(wrapper);
+			}
+		}
+
+		function resetUserForm() {
+			userForm.reset();
+			userIdInput.value = "";
+			userUsernameInput.disabled = false;
+			userUsernameInput.setCustomValidity("");
+			renderModuleCheckboxes();
+			userFormTitle.textContent = "Crear usuario";
+			userSubmitButton.innerHTML = '<i class="bi bi-plus-circle" aria-hidden="true"></i><span>Crear usuario</span>';
+			userCancelEditButton.classList.add("d-none");
+		}
+
+		function renderUsers() {
+			const query = userSearch.value.trim().toLocaleLowerCase("es");
+			const filtered = users.filter((user) =>
+				[user.username, user.fullName].some((value) => String(value ?? "").toLocaleLowerCase("es").includes(query))
+			);
+			userList.replaceChildren();
+			userTotal.textContent = String(users.length);
+			visibleUserCount.textContent = String(filtered.length);
+
+			if (filtered.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.colSpan = 5;
+				cell.className = "empty-cell";
+				const title = document.createElement("span");
+				title.className = "empty-title";
+				title.textContent = "No se encontraron coincidencias";
+				cell.append(title);
+				row.append(cell);
+				userList.append(row);
+				return;
+			}
+
+			for (const user of filtered) {
+				const isAdmin = user.role === "admin";
+				const row = document.createElement("tr");
+				const cells = [user.username, user.fullName || ""].map((value, index) => {
+					const cell = document.createElement("td");
+					const text = document.createElement("span");
+					text.className = index === 0 ? "machine-code" : "machine-brand";
+					text.textContent = value;
+					cell.append(text);
+					return cell;
+				});
+				const modulesCell = document.createElement("td");
+				const labels = isAdmin
+					? ["Todos los módulos"]
+					: ASSIGNABLE_MODULES.filter((module) => user.modules?.includes(module.id)).map((module) => module.label);
+				for (const labelText of labels) {
+					const badge = document.createElement("span");
+					badge.className = "module-badge";
+					badge.textContent = labelText;
+					modulesCell.append(badge);
+				}
+				const statusCell = document.createElement("td");
+				const status = document.createElement("span");
+				status.className = "machine-type";
+				status.textContent = user.mustChange ? "Pendiente de cambiar contraseña" : "Activo";
+				statusCell.append(status);
+
+				const actionCell = document.createElement("td");
+				const actions = document.createElement("div");
+				actions.className = "row-actions";
+				const buttons = [];
+				if (!isAdmin) buttons.push(createActionButton("bi-pencil-square", "Editar módulos", "edit-user", user.id));
+				if (user.id !== currentUser?.id) buttons.push(createActionButton("bi-key", "Restablecer contraseña", "reset-user", user.id));
+				if (!isAdmin) buttons.push(createActionButton("bi-trash3", "Eliminar", "delete-user", user.id));
+				for (const button of buttons) {
+					button.setAttribute("aria-label", `${button.title}: ${user.username}`);
+					actions.append(button);
+				}
+				actionCell.append(actions);
+				row.append(...cells, modulesCell, statusCell, actionCell);
+				userList.append(row);
+			}
+		}
+
+		userForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			hideUserFeedback();
+			userUsernameInput.setCustomValidity("");
+			if (!userForm.reportValidity()) return;
+
+			const modules = Array.from(userModulesBox.querySelectorAll("input:checked"), (input) => input.value);
+			if (modules.length === 0) {
+				showUserNotice("Selecciona al menos un módulo para el usuario.", "warning");
+				return;
+			}
+
+			const editingId = userIdInput.value;
+			const fullName = userFullnameInput.value.trim();
+
+			if (editingId) {
+				const previousUsers = users;
+				users = users.map((user) => user.id === editingId ? { ...user, fullName, modules } : user);
+				if (!saveUsers()) {
+					users = previousUsers;
+					return;
+				}
+				resetUserForm();
+				renderUsers();
+				showUserNotice("El usuario se actualizó correctamente.");
+				return;
+			}
+
+			const username = userUsernameInput.value.trim().toLocaleLowerCase("es");
+			if (users.some((user) => user.username === username)) {
+				userUsernameInput.setCustomValidity("Ya existe un usuario con este nombre.");
+				userUsernameInput.reportValidity();
+				return;
+			}
+
+			userSubmitButton.disabled = true;
+			try {
+				const password = generateTemporaryPassword();
+				const credentials = await createCredentials(password);
+				const previousUsers = users;
+				users = [...users, {
+					id: globalThis.crypto?.randomUUID?.() || String(Date.now()),
+					username, fullName, role: "user", modules, mustChange: true, ...credentials
+				}];
+				if (!saveUsers()) {
+					users = previousUsers;
+					return;
+				}
+				resetUserForm();
+				renderUsers();
+				showUserNotice("El usuario se creó correctamente.");
+				showCredentials(username, password);
+			} catch (error) {
+				showUserNotice(error.message, "danger");
+			} finally {
+				userSubmitButton.disabled = false;
+			}
+		});
+
+		userUsernameInput.addEventListener("input", () => userUsernameInput.setCustomValidity(""));
+		userSearch.addEventListener("input", renderUsers);
+		userCancelEditButton.addEventListener("click", () => {
+			resetUserForm();
+			hideUserFeedback();
+		});
+
+		userList.addEventListener("click", async (event) => {
+			const button = event.target.closest("button[data-action]");
+			if (!button) return;
+			const user = users.find((item) => item.id === button.dataset.id);
+			if (!user) return;
+			hideUserFeedback();
+
+			if (button.dataset.action === "edit-user" && user.role !== "admin") {
+				userIdInput.value = user.id;
+				userUsernameInput.value = user.username;
+				userUsernameInput.disabled = true;
+				userFullnameInput.value = user.fullName || "";
+				renderModuleCheckboxes(user.modules || []);
+				userFormTitle.textContent = "Editar usuario";
+				userSubmitButton.innerHTML = '<i class="bi bi-check2-circle" aria-hidden="true"></i><span>Guardar cambios</span>';
+				userCancelEditButton.classList.remove("d-none");
+				userFullnameInput.focus();
+				return;
+			}
+
+			if (button.dataset.action === "reset-user" && user.id !== currentUser?.id) {
+				if (!window.confirm(`¿Restablecer la contraseña de ${user.username}? Deberá cambiarla al ingresar.`)) return;
+				try {
+					const password = generateTemporaryPassword();
+					const credentials = await createCredentials(password);
+					const previousUsers = users;
+					users = users.map((item) => item.id === user.id ? { ...item, ...credentials, mustChange: true } : item);
+					if (!saveUsers()) {
+						users = previousUsers;
+						return;
+					}
+					renderUsers();
+					showUserNotice("La contraseña se restableció correctamente.");
+					showCredentials(user.username, password);
+				} catch (error) {
+					showUserNotice(error.message, "danger");
+				}
+				return;
+			}
+
+			if (button.dataset.action === "delete-user" && user.role !== "admin") {
+				if (!window.confirm(`¿Eliminar al usuario ${user.username}?`)) return;
+				const previousUsers = users;
+				users = users.filter((item) => item.id !== user.id);
+				if (!saveUsers()) {
+					users = previousUsers;
+					return;
+				}
+				if (userIdInput.value === user.id) resetUserForm();
+				renderUsers();
+				showUserNotice("El usuario se eliminó correctamente.");
+			}
+		});
+
+		document.querySelector("#copy-credentials").addEventListener("click", async () => {
+			const text = `Usuario: ${document.querySelector("#credentials-username").textContent}\nContraseña temporal: ${document.querySelector("#credentials-password").textContent}`;
+			try {
+				await navigator.clipboard.writeText(text);
+				showUserNotice("Datos copiados al portapapeles.");
+			} catch {
+				showUserNotice("No fue posible copiar; selecciona los datos manualmente.", "warning");
+			}
+		});
+
+		resetUserForm();
+		renderUsers();
 	</script>
 </body>
 </html>

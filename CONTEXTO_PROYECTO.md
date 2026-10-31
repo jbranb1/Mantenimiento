@@ -10,8 +10,9 @@ Este documento resume el comportamiento y las decisiones visibles en la implemen
 
 - Aplicación de una sola página, sin backend ni proceso de compilación aparente.
 - Al cargar la página se muestra una pantalla de bienvenida; el usuario debe seleccionar **Entrar al sistema** para acceder. Después aparece el área de trabajo con una ilustración industrial adaptable, sin módulos seleccionados, hasta que el usuario elija uno. La bienvenida aparece en cada carga y no guarda la elección.
-- Dos módulos activos: **Máquinas** y **Tipos de máquina**.
-- **Repuestos** y **Mantenimientos** se muestran como módulos próximamente disponibles; no tienen funcionalidad implementada.
+- Tres módulos funcionales: **Máquinas**, **Tipos de máquina** y **Repuestos** (en la pantalla de accesos y en el menú lateral), más **Administración** (solo para el administrador).
+- **Acceso con usuario y contraseña**: "Entrar al sistema" abre un inicio de sesión. Cada usuario solo ve (menú y accesos) los módulos que se le asignaron; el usuario `admin` ve todos, incluida Administración. La sesión vive en memoria: recargar o "Cerrar sesión" (botón en el pie del menú) vuelve a la bienvenida.
+- **Mantenimientos** se muestra como módulo próximamente disponible; no tiene funcionalidad implementada.
 - Los datos se persisten en `localStorage` del navegador. No se sincronizan entre navegadores, dispositivos o perfiles.
 - La interfaz y los mensajes están en español.
 
@@ -38,6 +39,21 @@ Este documento resume el comportamiento y las decisiones visibles en la implemen
 - Al iniciar por primera vez se proponen dos tipos predeterminados: **Motor de potencia** y **Cilindro neumático**.
 - Si hay máquinas guardadas cuyo tipo no aparece en el catálogo, el inicio incorpora esos tipos al catálogo con una descripción de recuperación.
 
+### Repuestos
+
+- Registrar, editar y eliminar repuestos (con confirmación), con la misma mecánica que Máquinas.
+- Campos: código de repuesto (único, se normaliza a mayúsculas), marca, modelo, numeración, tipo de material (texto libre), existencia (entero ≥ 0) y fotografía opcional.
+- Buscar por cualquiera de esos campos, ver la fotografía ampliada y exportar a `.xlsx` (hoja «Repuestos») con ExcelJS.
+- Independiente de los demás módulos: no se relaciona con tipos de máquina ni con máquinas.
+
+### Administración y usuarios
+
+- Solo el rol administrador accede al módulo. Permite crear usuarios (usuario, nombre completo y uno o más módulos), editar sus módulos, restablecer contraseña y eliminar usuarios.
+- Al crear o restablecer se genera una contraseña temporal de 10 caracteres que se muestra una sola vez para entregarla; el usuario está obligado a cambiarla en su primer ingreso (mínimo 8 caracteres, con letra y número, distinta de la temporal).
+- Administrador inicial: usuario `admin`, contraseña inicial `Admin2026!` (también debe cambiarla al primer ingreso). No se puede eliminar ni editar sus módulos.
+- Las contraseñas se guardan con PBKDF2-SHA-256 (sal aleatoria, 150 000 iteraciones) mediante `crypto.subtle` (requiere `localhost`/HTTPS/`file://`).
+- **Límite importante:** al ser una app sin backend, el control de acceso es solo de interfaz; quien tenga acceso al navegador puede leer o editar `localStorage`. No es seguridad real. Si se olvida la contraseña del administrador, la única recuperación es borrar `control-industrial-usuarios-v1` (se recrea `admin` con la contraseña inicial).
+
 ### Fotografías
 
 - Se aceptan archivos de imagen de hasta 15 MB.
@@ -51,6 +67,8 @@ Claves actuales de `localStorage`:
 
 - `control-industrial-maquinas-v1`: arreglo de máquinas.
 - `control-industrial-tipos-maquina-v1`: arreglo de tipos de máquina.
+- `control-industrial-repuestos-v1`: arreglo de repuestos `{ id, code, brand, model, numbering, material, stock, photoData }`.
+- `control-industrial-usuarios-v1`: arreglo de usuarios `{ id, username, fullName, role: "admin"|"user", modules: [ "machines" | "types" | "parts" ], mustChange, salt, hash }`.
 - `control-industrial-visitas-v1`: contador de visitas (entero). Se incrementa una vez por sesión de pestaña (marca en `sessionStorage`: `control-industrial-visita-registrada`) y se muestra bajo el reloj de la bienvenida. Es local a cada navegador/perfil, no global; si el almacenamiento falla, el contador se oculta.
 
 Forma de los registros que construye la aplicación:
